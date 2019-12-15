@@ -1,21 +1,21 @@
-title: "My JuliaCon proceeding"
+title: "Soss"
 keywords:
+  - Probabilistic Programming
   - Julia
-  - Optimization
-  - Game theory
-  - Compiler
+  - Bayesian modeling
+  - Metaprogramming
+  - Code generation
+  - Staged compilation
 authors:
-  - name: 1st author
-    orcid: 0000-0003-1361-440X
+  - name: Chad Scherrer
+    orcid: 0000-0002-1490-0304
     affiliation: 1
-  - name: 2nd author
-    affiliation: 1, 2
-  - name: 3rd author
+  - name: Taine Zhao
     affiliation: 2
 affiliations:
-  - name: University
+  - name: Relational AI
     index: 1
-  - name: National Lab
+  - name: Department of Computer Science, University of Tsukuba
     index: 2
-date: 24 April 2019
+date: 10 January 2020
 bibliography: ref.bib
