@@ -39,7 +39,19 @@ be produced article by article without losing sequential information.
 The use of document classes allows a simple change of style
 (or style option) to transform the appearance of your document.
 
-
+% using the backnaur package
+\begin{bnf*}
+    \bnfprod{model}{\bnfts{@model} \bnfsp \bnfpn{args} \bnfsp \bnfts{begin} \bnfsp \bnfpn{statements} \bnfsp \bnfpn{retn} \bnfsp \bnfts{end}}\\
+    \bnfprod{args}{\bnfes \bnfor \bnfpn{Symbol} \bnfor \bnfpn{Symbol} \bnfts{,} \bnfpn{args}} \\
+    \bnfprod{statements}{\bnfpn{statement} \bnfor \bnfpn{statement} \bnfts{\textbackslash n} \bnfpn{statements}} \\ 
+    \bnfprod{statement}{\bnfpn{assign} \bnfor \bnfpn{sample}} \\
+    \bnfprod{assign}{\bnfpn{Symbol} \bnfsp \bnfts{=} \bnfsp \bnfpn{Expr}} \\
+    \bnfprod{sample}{\bnfpn{Symbol} \bnfsp \bnfts{\textasciitilde}} \bnfsp \bnfpn{Measure} \\
+    \bnfprod{retn}{\bnfts{return} \bnfsp \bnfpn{Expr}} \\
+    \bnfprod{Symbol}{\bnftd{Julia Symbol}} \\ 
+    \bnfprod{Expr}{\bnftd{Julia Expr}} \\
+    \bnfprod{Measure}{\bnftd{Probability measure (see text)}}
+\end{bnf*}
 
 \section{The JuliaCon Article Class}
 \label{sec:documentclass}
