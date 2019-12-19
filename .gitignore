@@ -9,3 +9,4 @@ paper/paper.pdf
 *.bbl
 *.synctex.gz
 *.log
+.vscode/settings.json
