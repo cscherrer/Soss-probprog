@@ -1,0 +1,344 @@
+%%%% Small single column format
+\documentclass[anonymous=false, %
+               format=acmsmall, %
+               review=true, %
+               screen=true, %
+               nonacm=true]{acmart}
+
+\usepackage[ruled]{algorithm2e} 
+%\usepackage{parskip}
+
+\urlstyle{tt}
+\citestyle{acmauthoryear}
+
+\begin{document}
+
+\title{Formatting Instructions for PROBPROG 2020 Abstracts}
+%  \titlenote{This is a titlenote}
+%  \subtitle{This is a subtitle}
+%  \subtitlenote{Subtitle note}
+
+\author{Vikash Mansinghka}
+%\orcid{1234-5678-9012-3456}
+\affiliation{%
+  \institution{Massachussets Institute of Technology}
+  \department{Department of Brain and Cognitive Sciences}
+  %\streetaddress{43 Vassar St}
+  %\city{Cambridge}
+  %\state{MA}
+  %\postcode{02139}
+  %\country{USA}
+}
+\email{vkm@mit.edu}
+
+\author{Avi Pfeffer}
+%\orcid{1234-5678-9012-3456}
+\affiliation{%
+  \institution{Charles River Analytics}
+  %\streetaddress{625 Mt Auburn St #3}
+  %\city{Cambridge}
+  %\state{MA}
+  %\postcode{02138}
+  %\country{USA}
+}
+\email{apfeffer@cra.com}
+
+\author{Jean-Baptiste Tristan}
+%\orcid{1234-5678-9012-3456}
+\affiliation{%
+  \institution{Oracle Labs}
+  %\streetaddress{15 Network Dr}
+  %\city{Burlington}
+  %\state{MA}
+  %\postcode{01803}
+  %\country{USA}
+}
+\email{jean.baptiste.tristan@oracle.com}
+
+\author{Jan-Willem van de Meent}
+%\orcid{1234-5678-9012-3456}
+\affiliation{%
+  \institution{Northeastern University}
+  \department{Khoury College of Computer Sciences}
+  %\streetaddress{360 Huntington Ave}
+  \city{Boston}
+  \state{MA}
+  %\postcode{02115}
+  \country{USA}
+}
+\email{j.vandemeent@northeastern.edu}
+%\renewcommand\shortauthors{Mage, M. et al}
+
+\begin{abstract}
+These are formatting instructions for extended abstract submissions to the International Conference on Probabilistic Programmming (PROBPROG) 2020. Extended abstracts, which are non-archival, will be reviewed for consideration for a poster presentation or an oral presentation at the conference. Following the conference, authors of a selected abstracts will be invited to submit full-length papers to \emph{Probabilistic Programming}, a new online journal that accompanies the conference.
+\end{abstract}
+
+\maketitle
+
+\section{Length and Style}
+
+Extended abstracts may be 2--6 pages in length, exclusive of references. There is no length limitation on references. Authors may include supplementary material, which may be uploaded as part of a single PDF, but reviewers will not be required to comment on this material. 
+
+Authors are encouraged to make use of these style files, which are available at:
+\begin{center}
+   \url{https://probprog.cc/2020/probprog-2020-style.zip}
+\end{center}
+These files consist of:
+\begin{itemize}
+\item[-] \verb+probprog-2020-instructions.pdf+, which  contains these instructions and illustrates the format for PROBPROG extended abstracts.
+
+\item[-] \verb+probprog-2020-instructions.tex+, which may be used as a template for your submission. 
+
+\item[-] \verb+probprog-2020-instructions.bib+, which provides sample references. 
+
+\item[-] \verb+acmart.cls+. The LaTeX class developed by the Association for Computing Machinery (ACM). 
+
+\item[-] \verb+acm-reference-format.{bbx,bst,cbx,dbx}+. The default reference format. 
+\end{itemize}
+
+\section{Submission}
+
+Abstracts should be submitted via the PROBPROG 2020 CMT site:
+\begin{center}
+    \url{https://cmt3.research.microsoft.com/PROBPROG2020/}
+\end{center}
+Please ensure that the list and ordering of authors in the CMT record matches that of the submitted PDF file. This record may be used for purposes such as creating a listing on the conference website.
+
+\section{Formatting}
+
+\subsection{Title, Author List, and Abstract}
+
+This year, submissions do not have to be anonymous. Authors may optionally use the \verb|abstract| environment to include an overview of the submission. Author postal and e-mail addresses are listed at the bottom of the first page.
+
+\subsection{Headings}
+
+Sections should be numbered and use standard LaTex sectioning commands:
+\verb|\section|, \verb|\subsection|, \verb|\subsubsection|, and
+\verb|\paragraph|. 
+
+\subsection{Citations}
+
+Authors are allowed to use a citation style of their choosing. The use of BibTex for is strongly recommended. We provide the default ACM reference format as part of these style files. To  list references according to this format, include the following two lines just before the \verb|\end{document}| command:
+\begin{verbatim}
+  \bibliographystyle{acm-reference-format}
+  \bibliography{bibfile}
+\end{verbatim}
+Here ``\verb|bibfile|'' is the name, without the ``\verb|.bib|'' suffix, of the BibTex file.
+
+Citations and references are in ``author year'' style by default. Citations can either be listed in parentheses, e.g.~\cite{probprog2020instructions}, by using the standard \verb|\cite| command, or inline in the text, e.g.~\citet{probprog2020instructions}, by using the \verb|\citet| command.
+
+\subsection{Tables}
+
+The ``\verb|acmart|'' style includes the ``\verb|booktabs|''
+package \cite{Fear05} for preparing
+high-quality tables. Table captions are placed {\itshape above} the table. See Table~\ref{tab:freq} for an example.
+
+Because tables cannot be split across pages, the best placement for
+them is typically the top of the page nearest their initial cite.  To
+ensure this proper ``floating'' placement of tables, use the
+environment \verb|table| to enclose the table's contents and the
+table caption.  The contents of the table itself must go in the
+\verb|tabular| environment, to be aligned properly in rows and
+columns, with the desired horizontal and vertical rules.  Again,
+detailed instructions on \verb|tabular| material are found in the
+\textit{LaTeX\ User's Guide}.
+
+\begin{table}
+  \caption{Frequency of Special Characters}
+  \label{tab:freq}
+  \begin{tabular}{ccl}
+    \toprule
+    Non-English or Math&Frequency&Comments\\
+    \midrule
+    \O & 1 in 1,000& For Swedish names\\
+    $\pi$ & 1 in 5& Common in math\\
+    \$ & 4 in 5 & Used in business\\
+    $\Psi^2_1$ & 1 in 40,000& Unexplained usage\\
+  \bottomrule
+\end{tabular}
+\end{table}
+
+To set a wider table, which takes up the whole width of the page's
+live area, use the environment \verb|table*| to enclose the table's
+contents and the table caption.  As with a single-column table, this
+wide table will ``float'' to a location deemed more
+desirable. Immediately following this sentence is the point at which
+Table~\ref{tab:commands} is included in the input file; again, it is
+instructive to compare the placement of the table here with the table
+in the printed output of this document.
+
+\begin{table*}
+  \caption{Some Typical Commands}
+  \label{tab:commands}
+  \begin{tabular}{ccl}
+    \toprule
+    Command &A Number & Comments\\
+    \midrule
+    \texttt{{\char'134}author} & 100& Author \\
+    \texttt{{\char'134}table}& 300 & For tables\\
+    \texttt{{\char'134}table*}& 400& For wider tables\\
+    \bottomrule
+  \end{tabular}
+\end{table*}
+
+\subsection{Math Equations}
+You may want to display math equations in three distinct styles:
+inline, numbered or non-numbered display.  Each of the three are
+discussed in the next sections.
+
+\subsubsection{Inline (In-text) Equations}
+A formula that appears in the running text is called an inline or
+in-text formula.  It is produced by the \emph{math} environment,
+which can be invoked with the usual
+\texttt{{\char'134}begin\,\ldots{\char'134}end} construction or with
+the short form \texttt{\$\,\ldots\$}. You can use any of the symbols
+and structures, from $\alpha$ to $\omega$, available in
+LaTeX~\cite{Lamport:LaTeX}; this section will simply show a few
+examples of in-text equations in context. Notice how this equation:
+\begin{math}
+  \lim_{n\rightarrow \infty}x=0
+\end{math},
+set here in in-line math style, looks slightly different when
+set in display style.  (See next section).
+
+\subsubsection{Display Equations}
+A numbered display equation---one set off by vertical space from the
+text and centered horizontally---is produced by the \verb|equation|
+environment. An unnumbered display equation is produced by the
+\emph{displaymath} environment.
+
+Again, in either environment, you can use any of the symbols and
+structures available in LaTeX\@; this section will just give a couple
+of examples of display equations in context.  First, consider the
+equation, shown as an inline equation above:
+\begin{equation}
+  \lim_{n\rightarrow \infty}x=0
+\end{equation}
+Notice how it is formatted somewhat differently in
+the \emph{displaymath}
+environment.  Now, we'll enter an unnumbered equation:
+\begin{displaymath}
+  \sum_{i=0}^{\infty} x + 1
+\end{displaymath}
+and follow it with another numbered equation:
+\begin{equation}
+  \sum_{i=0}^{\infty}x_i=\int_{0}^{\pi+2} f
+\end{equation}
+just to demonstrate LaTeX's able handling of numbering.
+
+\subsection{Figures}
+
+The \verb|figure| environment should be used for figures. One or more images can be placed within a figure. Your figures should contain a caption which describes the figure to the reader. Figure captions are placed {\itshape below} the figure. See Figure~\ref{fig:example} for an example.
+
+\begin{figure}[!t]
+  \centering
+  %\fbox{\rule[-.5cm]{0cm}{\linedwid} \rule[-.5cm]{4cm}{0cm}}
+  \framebox[0.8\linewidth]{\rule{0pt}{1.5in}}
+  \caption{Figure captions are positioned below the image.}
+  \label{fig:example}
+  \Description{Placeholder figure.}
+\end{figure}
+
+
+
+% \subsection{Citations within the text}
+
+
+% Citations within the text should be based on the \texttt{natbib} package
+% and include the authors' last names and year (with the ``et~al.'' construct
+% for more than two authors). When the authors or the publication are
+% included in the sentence, the citation should not be in parenthesis (as
+% in ``See \citet{Hinton06} for more information.''). Otherwise, the citation
+% should be in parenthesis (as in ``Deep learning shows promise to make progress towards AI~\citep{Bengio+chapter2007}.'').
+
+% The corresponding references are to be listed in alphabetical order of
+% authors, in the \textsc{References} section. As to the format of the
+% references themselves, any style is acceptable as long as it is used
+% consistently.
+
+% \subsection{Footnotes}
+
+% Indicate footnotes with a number\footnote{Sample of the first footnote} in the
+% text. Place the footnotes at the bottom of the page on which they appear.
+% Precede the footnote with a horizontal rule of 2~inches
+% (12~picas).\footnote{Sample of the second footnote}
+
+% \subsection{Figures}
+
+% All artwork must be neat, clean, and legible. Lines should be dark
+% enough for purposes of reproduction; art work should not be
+% hand-drawn. The figure number and caption always appear after the
+% figure. Place one line space before the figure caption, and one line
+% space after the figure. The figure caption is lower case (except for
+% first word and proper nouns); figures are numbered consecutively.
+
+% Make sure the figure caption does not get separated from the figure.
+% Leave sufficient space to avoid splitting the figure and figure caption.
+
+% You may use color figures.
+% However, it is best for the
+% figure captions and the paper body to make sense if the paper is printed
+% either in black/white or in color.
+% \begin{figure}[h]
+% \begin{center}
+% %\framebox[4.0in]{$\;$}
+% \fbox{\rule[-.5cm]{0cm}{4cm} \rule[-.5cm]{4cm}{0cm}}
+% \end{center}
+% \caption{Sample figure caption.}
+% \end{figure}
+
+% \subsection{Tables}
+
+% All tables must be centered, neat, clean and legible. Do not use hand-drawn
+% tables. The table number and title always appear before the table. See
+% Table~\ref{sample-table}.
+
+% Place one line space before the table title, one line space after the table
+% title, and one line space after the table. The table title must be lower case
+% (except for first word and proper nouns); tables are numbered consecutively.
+
+% \begin{table}[t]
+% \caption{Sample table title}
+% \label{sample-table}
+% \begin{center}
+% \begin{tabular}{ll}
+% \toprule
+% \multicolumn{1}{c}{\bf Part}  &\multicolumn{1}{c}{\bf Description}\\ 
+% \midrule
+% Dendrite         &Input terminal \\
+% Axon             &Output terminal \\
+% Soma             &Cell body (contains cell nucleus) \\
+% \bottomrule
+% \end{tabular}
+% \end{center}
+% \end{table}
+
+\section{End Matter}
+
+Identification of funding sources and other support, and thanks to
+individuals and groups that assisted in the research and the
+preparation of the work should be included in an acknowledgment
+section, which is placed just before the reference section in your
+document. This section has a special environment:
+\begin{verbatim}
+  \begin{acks}
+  ...
+  \end{acks}
+\end{verbatim}
+This ensure that information contained therein can be more easily collected during the article metadata extraction phase, and ensures consistency in the spelling of the section heading. An example is below.
+
+The \verb|\appendix| command is used to start the appendix sections in the document, which are indexed with letters rather than numbers. This command should be included after  the \verb|\bibliography| command, which creates the references section. 
+
+\begin{acks}
+We would like to acknowledge Boris Veytsman and the Association for Computing Machinery for creating the excellent ACM article class that we use for PROBPROG submissions.
+\end{acks}
+
+\bibliographystyle{acm-reference-format}
+\bibliography{probprog-2020-instructions}
+
+\appendix
+
+\section{Appendices}
+
+Authors may provide appendices to accompany their extended abstract submissions. Please note however that reviewers will not be required to comment on material in these appendices.
+\end{document}
