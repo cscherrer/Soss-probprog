@@ -8,6 +8,7 @@
 \usepackage[ruled]{algorithm2e} 
 %\usepackage{parskip}
 \usepackage{backnaur}
+\usepackage{jlcode}
 
 \urlstyle{tt}
 \citestyle{acmauthoryear}
@@ -54,8 +55,16 @@ Abstract goes here
 
 \section{Introduction}
 
+Here's some example code. Lots of dead space on the right, maybe want to try to keep code in a multi-column figure
 
-
+\begin{lstlisting}[language = Julia]
+  using Plots
+  
+  x = -3.0:0.01:3.0
+  y = rand(length(x))
+  plot(x, y)
+\end{lstlisting}
+  
 
 \section{End Matter}
 
