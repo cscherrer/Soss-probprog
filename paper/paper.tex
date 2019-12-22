@@ -9,6 +9,7 @@
 %\usepackage{parskip}
 \usepackage{backnaur}
 \usepackage{jlcode}
+\usepackage{todonotes}
 
 \urlstyle{tt}
 \citestyle{acmauthoryear}
@@ -108,9 +109,24 @@ The \verb|\appendix| command is used to start the appendix sections in the docum
 
 \section{Implementation}
 
+\begin{lstlisting}[language=julia]
+struct Model{A,B,M} 
+    args  :: Vector{Symbol}
+    vals  :: NamedTuple
+    dists :: NamedTuple
+    retn  :: Union{Nothing, Symbol, Expr}
+end
+\end{lstlisting}
 
 
 \section{Performance}
+
+
+\todo[inline]{Can Soss really generate arbitrary code?}
+The ability to generate arbitrary  Julia code makes it difficult to measure performance in Soss. When a performance bottleneck is found, developers or users can ask Soss to generate something different. This design places no a priori constraints on performance.
+
+
+\section{Extending Soss}
 
 
 
