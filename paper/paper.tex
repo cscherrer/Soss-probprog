@@ -49,12 +49,14 @@
 %\renewcommand\shortauthors{Mage, M. et al}
 
 \begin{abstract}
-Abstract goes here
+Soss is a Julia-based embedded probabilistic programming language.
 \end{abstract}
 
 \maketitle
 
 \section{Introduction}
+
+
 
 Here's some example code. Lots of dead space on the right, maybe want to try to keep code in a multi-column figure
 
@@ -86,6 +88,68 @@ The \verb|\appendix| command is used to start the appendix sections in the docum
 \section{Model syntax}
 
 
+
+\section{Model Transformations}
+
+\subsection{Markov Blankets}
+
+\subsection{Conditional Predictive models}
+
+
+
+
+\subsection{Do}
+
+\section{Symbolic Simplifcation}
+
+\section{Code Generation}
+
+\section{Implementation}
+
+\begin{lstlisting}[language=julia]
+struct Model{A,B,M} 
+    args  :: Vector{Symbol}
+    vals  :: NamedTuple
+    dists :: NamedTuple
+    retn  :: Union{Nothing, Symbol, Expr}
+end
+\end{lstlisting}
+
+
+\section{Performance}
+
+\todo[inline]{Let's implement models from \url{https://statisticalrethinkingjulia.github.io/MCMCBenchmarks.jl/latest/benchmarks/} for benchmark comparisons}
+
+\todo[inline]{Can Soss really generate arbitrary code?}
+
+The ability to generate arbitrary  Julia code makes it difficult to measure performance in Soss. When a performance bottleneck is found, developers or users can ask Soss to generate something different. This design places no a priori constraints on performance.
+
+
+\section{Extending Soss}
+
+\section{Related Work}
+
+The idea of code generation and symbolic simplification in an embedded PPL goes back to \emph{Passage} \cite{Scherrer2012}. 
+
+\emph{Hakaru} \cite{narayanan2016probabilistic} takes a more ambitious symbolic approach in a stand-alone PPL, allowing a wider variety of program transformations. 
+
+Soss began with a goal of representing models with continuous, fixed-dimensionality parameter spaces, inspried by \emph{Stan} \cite{stan:2017}.
+
+\emph{Gen} \cite{Cusumano-Towner:2019} was developed independently from Soss, but takes a similar approach (and distinct from most PPLs) in its representation of a model as a function from its arguments to a "trace" (to use Gen's terminology). In both Soss and Gen's static DSL, this trace is a mapping from variable names to values. The similarity of these systems makes interoperability relatively straightforward, as demonstrated in \emph{SossGen}(\url{https://github.com/cscherrer/SossGen.jl}).
+
+\emph{Turing} \cite{ge2018t}
+
+\begin{acks}
+We would like to acknowledge...
+\end{acks}
+
+\bibliographystyle{acm-reference-format}
+\bibliography{ref}
+
+\appendix
+
+\section{Model Syntax}
+
 \begin{figure}[!t]
   \centering
   %\fbox{\rule[-.5cm]{0cm}{\linedwid} \rule[-.5cm]{4cm}{0cm}}
@@ -107,49 +171,6 @@ The \verb|\appendix| command is used to start the appendix sections in the docum
   \Description{Placeholder figure.}
 \end{figure}
 
-\section{Implementation}
-
-\begin{lstlisting}[language=julia]
-struct Model{A,B,M} 
-    args  :: Vector{Symbol}
-    vals  :: NamedTuple
-    dists :: NamedTuple
-    retn  :: Union{Nothing, Symbol, Expr}
-end
-\end{lstlisting}
-
-
-\section{Performance}
-
-
-\todo[inline]{Can Soss really generate arbitrary code?}
-The ability to generate arbitrary  Julia code makes it difficult to measure performance in Soss. When a performance bottleneck is found, developers or users can ask Soss to generate something different. This design places no a priori constraints on performance.
-
-
-\section{Extending Soss}
-
-\section{Related Work}
-
-The idea of code generation and symbolic simplification in an embedded PPL goes back to \emph{Passage} \cite{Scherrer2012}. 
-
-\emph{Hakaru} \cite{narayanan2016probabilistic} takes a more ambitious symbolic approach in a stand-alone PPL, allowing a wider variety of program transformations. 
-
-Soss began with a goal of representing models with continuous, fixed-dimensionality parameter spaces, inspried by \emph{Stan} \cite{stan:2017}.
-
-\emph{Gen} \cite{Cusumano-Towner:2019}
-
-\emph{Turing} \cite{ge2018t}
-
-\begin{acks}
-We would like to acknowledge...
-\end{acks}
-
-\bibliographystyle{acm-reference-format}
-\bibliography{ref}
-
-\appendix
-
-\section{Appendices}
 
 Authors may provide appendices to accompany their extended abstract submissions. Please note however that reviewers will not be required to comment on material in these appendices.
 \end{document}
