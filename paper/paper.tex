@@ -49,14 +49,14 @@
 %\renewcommand\shortauthors{Mage, M. et al}
 
 \begin{abstract}
-Soss is a Julia-based embedded probabilistic programming language.
+Soss is a probabilistic programming language embedded probabilistic programming language embedded in the Julia language. Soss represents statistical models in terms of abstract syntax trees, and uses staged compilation for on-demand generation of ``inference primitives'' (random sampling, log-density, etc) without reqquiring casual users to worry about such details.
 \end{abstract}
 
 \maketitle
 
 \section{Introduction}
 
-
+There are many approaches to building a Probabilistic Programming Language (``PPL''). Soss is distinct from most in a number of ways...
 
 Here's some example code. Lots of dead space on the right, maybe want to try to keep code in a multi-column figure
 
@@ -68,23 +68,6 @@ Here's some example code. Lots of dead space on the right, maybe want to try to 
   plot(x, y)
 \end{lstlisting}
   
-
-\section{End Matter}
-
-Identification of funding sources and other support, and thanks to
-individuals and groups that assisted in the research and the
-preparation of the work should be included in an acknowledgment
-section, which is placed just before the reference section in your
-document. This section has a special environment:
-\begin{verbatim}
-  \begin{acks}
-  ...
-  \end{acks}
-\end{verbatim}
-This ensure that information contained therein can be more easily collected during the article metadata extraction phase, and ensures consistency in the spelling of the section heading. An example is below.
-
-The \verb|\appendix| command is used to start the appendix sections in the document, which are indexed with letters rather than numbers. This command should be included after  the \verb|\bibliography| command, which creates the references section. 
-
 \section{Model syntax}
 
 
@@ -98,9 +81,11 @@ The \verb|\appendix| command is used to start the appendix sections in the docum
 
 
 
-\subsection{Do}
+\subsection{Causal Interventions (``Do'' operator)}
 
 \section{Symbolic Simplifcation}
+
+
 
 \section{Code Generation}
 
@@ -135,7 +120,7 @@ The idea of code generation and symbolic simplification in an embedded PPL goes 
 
 Soss began with a goal of representing models with continuous, fixed-dimensionality parameter spaces, inspried by \emph{Stan} \cite{stan:2017}.
 
-\emph{Gen} \cite{Cusumano-Towner:2019} was developed independently from Soss, but takes a similar approach (and distinct from most PPLs) in its representation of a model as a function from its arguments to a "trace" (to use Gen's terminology). In both Soss and Gen's static DSL, this trace is a mapping from variable names to values. The similarity of these systems makes interoperability relatively straightforward, as demonstrated in \emph{SossGen}(\url{https://github.com/cscherrer/SossGen.jl}).
+\emph{Gen} \cite{Cusumano-Towner:2019} was developed independently from Soss, but takes a similar approach (and distinct from most PPLs) in its representation of a model as a function from its arguments to a "trace" (to use Gen's terminology). In both Soss and Gen's static DSL, this trace is a mapping from variable names to values. The similarity of these systems makes interoperability relatively straightforward, as demonstrated in \emph{SossGen} (\url{https://github.com/cscherrer/SossGen.jl}).
 
 \emph{Turing} \cite{ge2018t}
 
