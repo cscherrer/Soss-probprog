@@ -49,7 +49,9 @@
 %\renewcommand\shortauthors{Mage, M. et al}
 
 \begin{abstract}
-Soss is a probabilistic programming language embedded probabilistic programming language embedded in the Julia language. Soss represents statistical models in terms of abstract syntax trees, and uses staged compilation for on-demand generation of ``inference primitives'' (random sampling, log-density, etc) without reqquiring casual users to worry about such details.
+We present Soss, a probabilistic programming language embedded in the Julia language. Soss represents statistical models in terms of abstract syntax trees, and uses staged compilation for on-demand generation of ``inference primitives'' (random sampling, log-density, etc) without reqquiring casual users to worry about such details.
+
+The approach taken by Soss makes it easy to extend to take advantage of other packages in the rapidly-growing Julia ecosystem. At the time of this writing, Soss users can choose from several inference back-ends and connect easily with larger systems SymPy and Gen.
 \end{abstract}
 
 \maketitle
@@ -61,16 +63,21 @@ There are many approaches to building a Probabilistic Programming Language (``PP
 Here's some example code. Lots of dead space on the right, maybe want to try to keep code in a multi-column figure
 
 \begin{lstlisting}[language = Julia]
-  using Plots
-  
-  x = -3.0:0.01:3.0
-  y = rand(length(x))
-  plot(x, y)
-\end{lstlisting}
+m = @model n begin
+    x ~ Normal(0,10) |> iid(n)
+    α ~ Normal()
+    β ~ Normal()
+    σ ~ HalfNormal()
+    yhat = α .+ β .* x
+    y ~ For(n) do j 
+            Normal(yhat[j],σ)
+        end
+end
+\end{lstlisting} 
   
 \section{Model syntax}
 
-
+ 
 
 \section{Model Transformations}
 
@@ -83,11 +90,43 @@ Here's some example code. Lots of dead space on the right, maybe want to try to 
 
 \subsection{Causal Interventions (``Do'' operator)}
 
-\section{Symbolic Simplifcation}
+\section{Symbolic Manipulation}
+
+\subsection{Symbolic Log-density}
+
+\[
+  \ell =
+  - 0.5 α^{2} 
+  - 0.5 β^{2}
+  - σ^{2} 
+  + \sum_{\left(j_{1}\right)=1}^{n} \left(- \log{\left(\sigma \right)} 
+  - \frac{\log{\left(\pi \right)}}{2} 
+  - \frac{\log{\left(2 \right)}}{2} 
+  - \frac{\left({y}_{\left(j_{1}\right)} 
+  - {\hat{y}}_{\left(j_{1}\right)}\right)^{2}}{2 \sigma^{2}}\right) 
+  + \sum_{j_{1}=1}^{n} \left(- 0.005 {x}_{j_{1}}^{2} 
+  - 2.99573227355399 
+  - \frac{\log{\left(\pi \right)}}{2} 
+  + \frac{\log{\left(2 \right)}}{2}\right) 
+  - 2 \log{\left(\pi \right)} 
+  - 1.38629436111989
+\]
 
 
+\[
+  \ell =
+  - 3.7 
+  - 4.1 n 
+  - \frac{ \alpha^{2} }{2}
+  - \frac{\beta^2}{2}
+  - \sigma^{2} 
+  - n \log{\left(\sigma \right)} 
+  - 0.005 \sum_{j_{1}=1}^{n} {x}_{j_{1}}^{2} 
+  - \frac{1}{\sigma^2}\sum_{j_{1}=1}^{n} \left({y}_{j_{1}} 
+  - {\hat{y}}_{j_{1}}\right)^{2}
+\]
 
-\section{Code Generation}
+\subsection{Code Generation}
 
 \section{Implementation}
 
