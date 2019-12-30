@@ -10,7 +10,7 @@
 \usepackage{backnaur}
 \usepackage{jlcode}
 \usepackage{todonotes}
-\usepackage{textalpha}
+% \usepackage{textalpha}
 
 \urlstyle{tt}
 \citestyle{acmauthoryear}
@@ -96,23 +96,27 @@ end
 \subsection{Symbolic Log-density}
 
 \[
-  \ell =
-  - 0.5 α^{2} 
-  - 0.5 β^{2}
-  - σ^{2} 
-  + \sum_{\left(j_{1}\right)=1}^{n} \left(- \log{\left(\sigma \right)} 
-  - \frac{\log{\left(\pi \right)}}{2} 
-  - \frac{\log{\left(2 \right)}}{2} 
-  - \frac{\left({y}_{\left(j_{1}\right)} 
-  - {\hat{y}}_{\left(j_{1}\right)}\right)^{2}}{2 \sigma^{2}}\right) 
-  + \sum_{j_{1}=1}^{n} \left(- 0.005 {x}_{j_{1}}^{2} 
-  - 2.99573227355399 
-  - \frac{\log{\left(\pi \right)}}{2} 
-  + \frac{\log{\left(2 \right)}}{2}\right) 
-  - 2 \log{\left(\pi \right)} 
-  - 1.38629436111989
+    \ell = \beta
+    - 0.5 \alpha^{2} 
+    - 0.5 \beta^{2}
+    - \sigma^{2} 
+    + \sum_{\left(j_{1}\right)=1}^{n} \left(
+        - \log{\left(\sigma \right)} 
+        - \frac{\log{\left(\pi \right)}}{2} 
+        - \frac{\log{\left(2 \right)}}{2} 
+        - \frac{\left({y}_{\left(j_{1}\right)} 
+        - {\hat{y}}_{\left(j_{1}\right)}\right)^{2}}{2 \sigma^{2}}
+        \right) 
+    + \sum_{j_{1}=1}^{n} \left(
+        - 0.005 {x}_{j_{1}}^{2} 
+        - 3.0 
+        - \frac{\log{\left(\pi \right)}}{2} 
+        + \frac{\log{\left(2 \right)}}{2}
+        \right) 
+    - 2 \log{\left(\pi \right)} 
+    - 1.38629436111989
 \]
-
+ 
 
 \[
   \ell =
