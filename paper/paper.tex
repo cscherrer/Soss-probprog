@@ -158,7 +158,7 @@ The idea of code generation and symbolic simplification in an embedded PPL goes 
 
 \emph{Hakaru} \cite{narayanan2016probabilistic} takes a more ambitious symbolic approach in a stand-alone PPL, allowing a wider variety of program transformations. 
 
-Soss began with a goal of representing models with continuous, fixed-dimensionality parameter spaces, inspried by \emph{Stan} \cite{stan:2017}.
+Soss began with a goal of representing models with continuous, fixed-dimensionality parameter spaces, inspied by \emph{Stan} \cite{stan:2017}.
 
 \emph{Gen} \cite{Cusumano-Towner:2019} was developed independently from Soss, but takes a similar approach (and distinct from most PPLs) in its representation of a model as a function from its arguments to a "trace" (to use Gen's terminology). In both Soss and Gen's static DSL, this trace is a mapping from variable names to values. The similarity of these systems makes interoperability relatively straightforward, as demonstrated in \emph{SossGen} (\url{https://github.com/cscherrer/SossGen.jl}).
 
@@ -180,9 +180,9 @@ We would like to acknowledge...
   %\fbox{\rule[-.5cm]{0cm}{\linedwid} \rule[-.5cm]{4cm}{0cm}}
   % using the backnaur package
 \begin{bnf*}
-  \bnfprod{model}{\bnfts{@model} \bnfsp \bnfpn{args} \bnfsp \bnfts{begin} \bnfsp \bnfpn{statements} \bnfsp \bnfpn{retn} \bnfsp \bnfts{end}}\\
+  \bnfprod{model}{\bnfts{@model} \bnfsp \bnfpn{args} \bnfsp \bnfts{begin} \bnfsp \bnfpn{statements} \bnfsp \bnfts{end}}\\
   \bnfprod{args}{\bnfes \bnfor \bnfpn{Symbol} \bnfor \bnfpn{Symbol} \bnfts{,} \bnfpn{args}} \\
-  \bnfprod{statements}{\bnfpn{statement} \bnfor \bnfpn{statement} \bnfts{\textbackslash n} \bnfpn{statements}} \\ 
+  \bnfprod{statements}{\bnfpn{statement} \bnfor \bnfpn{statement} \bnfsp \bnftd{Julia Line Sep} \bnfsp \bnfpn{statements} \bnfor \bnfpn{statements} \bnfsp \bnfpn{retn}} \\ 
   \bnfprod{statement}{\bnfpn{assign} \bnfor \bnfpn{sample}} \\
   \bnfprod{assign}{\bnfpn{Symbol} \bnfsp \bnfts{=} \bnfsp \bnfpn{Expr}} \\
   \bnfprod{sample}{\bnfpn{Symbol} \bnfsp \bnfts{\textasciitilde}} \bnfsp \bnfpn{Measure} \\
