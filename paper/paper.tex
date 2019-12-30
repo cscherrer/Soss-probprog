@@ -11,6 +11,8 @@
 \usepackage{jlcode}
 \usepackage{todonotes}
 % \usepackage{textalpha}
+\usepackage{tikz}
+\usetikzlibrary{bayesnet}
 
 \urlstyle{tt}
 \citestyle{acmauthoryear}
@@ -63,15 +65,42 @@ There are many approaches to building a Probabilistic Programming Language (``PP
 
 Here's some example code. Lots of dead space on the right, maybe want to try to keep code in a multi-column figure
 
+\begin{tikzpicture}
+
+    \node[obs] (y) {$y$};
+    \node[det, above=of y] (yhat) {$\hat{y}$};
+    \node[latent, left=of yhat] (epsi) {$\varepsilon_I$};
+    \node[latent, above=of yhat] (alpha) {$\alpha$};
+    \node[latent, right=of yhat] (epsj) {$\varepsilon_J$};
+    \node[latent, left=of alpha] (sigi) {$\sigma_I$};
+    \node[latent, right=of alpha] (sigj) {$\sigma_J$};
+    \node[latent, below=of y] (sigma) {$\sigma$};
+    
+    \edge {sigi} {epsi};
+    \edge {sigj} {epsj};
+    \edge {sigma, yhat} {y};
+    \edge {alpha} {sigi};
+    \edge {alpha} {sigj};
+    \edge {epsi,epsj} {yhat};
+
+    \plate {I} {(y)(yhat)(epsi)} {$I$};
+    \plate {J} {(y)(yhat)(epsj)(I.north east)} {$J$};
+  
+  \end{tikzpicture}
+
 \begin{lstlisting}[language = Julia]
-m = @model n begin
-    x ~ Normal(0,10) |> iid(n)
-    α ~ Normal()
-    β ~ Normal()
+
+m = @model I,J begin
+    α ~ HalfCauchy()
+    σi ~ HalfNormal(α)
+    σj ~ HalfNormal(α)
+
+    εi ~ Normal(0, σi) |> iid(I)
+    εj ~ Normal(0, σj) |> iid(J)
+    yhat = εz .+ εy'
     σ ~ HalfNormal()
-    yhat = α .+ β .* x
-    y ~ For(n) do j 
-            Normal(yhat[j],σ)
+    y ~ For(I,J) do i,j 
+            Normal(yhat[i,j], σ)
         end
 end
 \end{lstlisting} 
