@@ -3,7 +3,7 @@
                format=acmsmall, %
                review=true, %
                screen=true, %
-               nonacm=true]{acmart}
+               nonacm=true]{acmart} 
 
 
 \usepackage[ruled]{algorithm2e} 
@@ -11,14 +11,17 @@
 \usepackage{backnaur}
 % \usepackage{jlcode}  
 \usepackage{todonotes}
+\usepackage{alphabeta}
 % \usepackage{textalpha}
 \usepackage{tikz}
+\usepackage{bookmark}
 \usetikzlibrary{bayesnet}
 
 
 \usepackage{graphicx}
 \usepackage{subcaption}
-\usepackage[utf8x]{inputenc}
+\usepackage[utf8]{inputenc}
+% \usepackage{unicode-math}
 \usepackage{textgreek}
 \usepackage{minted} 
 
@@ -83,22 +86,22 @@ Here's some example code. Lots of dead space on the right, maybe want to try to 
 
             \node[obs] (y) {$y$};
             \node[det, above=of y] (yhat) {$\hat{y}$};
-            \node[latent, left=of yhat] (epsi) {$\varepsilon_I$};
-            \node[latent, above=of yhat] (alpha) {$\alpha$};
-            \node[latent, right=of yhat] (epsj) {$\varepsilon_J$};
-            \node[latent, left=of alpha] (sigi) {$\sigma_I$};
-            \node[latent, right=of alpha] (sigj) {$\sigma_J$};
+            \node[latent, left=of yhat] (alpha) {$\alpha$};
+            \node[latent, above=of yhat] (lambda) {$\lambda$};
+            \node[latent, right=of yhat] (beta) {$\beta$};
+            \node[latent, left=of lambda] (sigi) {$\sigma_I$};
+            \node[latent, right=of lambda] (sigj) {$\sigma_J$};
             \node[latent, below=of y] (sigma) {$\sigma$};
             
-            \edge {sigi} {epsi};
-            \edge {sigj} {epsj};
+            \edge {sigi} {alpha};
+            \edge {sigj} {beta};
             \edge {sigma, yhat} {y};
-            \edge {alpha} {sigi};
-            \edge {alpha} {sigj};
-            \edge {epsi,epsj} {yhat};
+            \edge {lambda} {sigi};
+            \edge {lambda} {sigj};
+            \edge {alpha,beta} {yhat};
         
-            \plate {I} {(y)(yhat)(epsi)} {$I$};
-            \plate {J} {(y)(yhat)(epsj)(I.north east)} {$J$};
+            \plate {I} {(y)(yhat)(alpha)} {$I$};
+            \plate {J} {(y)(yhat)(beta)(I.north east)} {$J$};
           
         \end{tikzpicture}
         \caption{}
@@ -107,24 +110,25 @@ Here's some example code. Lots of dead space on the right, maybe want to try to 
     \begin{subfigure}[b]{0.4\textwidth}
 
     \begin{minted}{julia}
-    m = @model I,J begin
-        α ~ HalfCauchy()
-        σi ~ HalfNormal(α)
-        σj ~ HalfNormal(α)
+m = @model I,J begin
+    λ ~ HalfCauchy()
+    σI ~ HalfNormal(λ)
+    σJ ~ HalfNormal(λ)
     
-        εi ~ Normal(0, σi) |> iid(I)
-        εj ~ Normal(0, σj) |> iid(J)
-        yhat = εz .+ εy'
-        σ ~ HalfNormal()
-        y ~ For(I,J) do i,j 
-                Normal(yhat[i,j], σ)
-            end
+    α ~ Normal(0, σI) |> iid(I)
+    β ~ Normal(0, σJ) |> iid(J)
+    yhat = α .+ β'
+
+    σ ~ HalfNormal()
+    y ~ For(I,J) do i,j 
+            Normal(yhat[i,j], σ)
         end
+    end
     \end{minted} 
     \caption{}
     \end{subfigure}
 
-    \caption{A plate diagram (a) and Soss encoding (b) for a two-way analysis of variance model}
+    \caption{A plate diagram (a) and Soss encoding (b) for a two-way analysis of variance model.}
     \label{}
 \end{figure}
 
@@ -151,39 +155,34 @@ Here's some example code. Lots of dead space on the right, maybe want to try to 
 \subsection{Symbolic Log-density}
 
 \[
-    \ell = \beta
-    - 0.5 \alpha^{2} 
-    - 0.5 \beta^{2}
-    - \sigma^{2} 
-    + \sum_{\left(j_{1}\right)=1}^{n} \left(
-        - \log{\left(\sigma \right)} 
-        - \frac{\log{\left(\pi \right)}}{2} 
-        - \frac{\log{\left(2 \right)}}{2} 
-        - \frac{\left({y}_{\left(j_{1}\right)} 
-        - {\hat{y}}_{\left(j_{1}\right)}\right)^{2}}{2 \sigma^{2}}
-        \right) 
-    + \sum_{j_{1}=1}^{n} \left(
-        - 0.005 {x}_{j_{1}}^{2} 
-        - 3.0 
-        - \frac{\log{\left(\pi \right)}}{2} 
-        + \frac{\log{\left(2 \right)}}{2}
-        \right) 
-    - 2 \log{\left(\pi \right)} 
-    - 1.38629436111989
+\begin{aligned}
+    \ell = 
+       &- 3 \log{\left(2 \right)} 
+        - 5 \log{\left(\pi \right)} 
+    \\ &- σ^{2} 
+        - 4 \log{\left(λ \right)} 
+        - 2 \log{\left(λ^{2} + 1 \right)} 
+        - \frac{σ_I^{2}}{λ^{2}} 
+        - \frac{σ_J^{2}}{λ^{2}}
+    \\ &+ \sum_{i=1}^{I} \left(- \log{\left(σ_I \right)} - \frac{\log{\pi }}{2} - \frac{\log{2 }}{2} - \frac{{α}_{i}^{2}}{2 σ_I^{2}}\right) 
+    \\ &+ \sum_{j=1}^{J} \left(- \log{\left(σ_J \right)} - \frac{\log{\pi }}{2} - \frac{\log{2 }}{2} - \frac{{β}_{j}^{2}}{2 σ_J^{2}}\right) 
+    \\ &+ \sum_{\substack{1 \leq i \leq I \\ 1 \leq j \leq J}} \left(- \log{\left(σ \right)} - \frac{\log{\pi }}{2} - \frac{\log{2 }}{2} - \frac{\left({y}_{ij} - {\hat{y}}_{ij}\right)^{2}}{2 σ^{2}}\right) 
+\end{aligned}
 \]
- 
+
 
 \[
-  \ell =
-  - 3.7 
-  - 4.1 n 
-  - \frac{ \alpha^{2} }{2}
-  - \frac{\beta^2}{2}
-  - \sigma^{2} 
-  - n \log{\left(\sigma \right)} 
-  - 0.005 \sum_{j_{1}=1}^{n} {x}_{j_{1}}^{2} 
-  - \frac{1}{\sigma^2}\sum_{j_{1}=1}^{n} \left({y}_{j_{1}} 
-  - {\hat{y}}_{j_{1}}\right)^{2}
+    \begin{aligned}
+    \ell =
+    &- 7.8 - 0.92 I - 0.92 J - 0.92 I J 
+    \\ &- 4 \log{λ } - 2 \log{\left(λ^{2} + 1 \right)} 
+        - σ^{2} 
+        - I J \log{σ } 
+    \\ &- I \log{σ_I } - J \log{σ_J } - \frac{σ_I^{2}}{λ^{2}}  - \frac{σ_J^{2}}{λ^{2}}
+    \\ &- \frac{1}{2 σ_I^{2}} \sum_{i=1}^{I} {α}_{i}^{2}
+        - \frac{1}{2 σ_J^{2}} \sum_{j=1}^{J} {β}_{j}^{2}
+        - \frac{1}{2 σ^{2}} \sum_{\substack{1 \leq i \leq I\\1 \leq j \leq J}} \left({y}_{ij} - {\hat{y}}_{ij}\right)^{2}
+    \end{aligned}
 \]
 
 \subsection{Code Generation}
