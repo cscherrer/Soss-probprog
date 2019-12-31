@@ -75,10 +75,10 @@ The approach taken by Soss makes it easy to extend to take advantage of other pa
 
 \section{Introduction}
 
-There are many approaches to building a Probabilistic Programming Language (``PPL''). Soss is distinct from most alternative in a number of ways...
+There are many approaches to building a Probabilistic Programming Language (``PPL''). Soss is distinct from most alternatives in a number of ways:
 
 \begin{itemize}
-    \item Model specification in Soss is \emph{declarative}; statements are ordered not by the order entered by the user, but by the partial order given by their variable dependencies.
+    \item Model specification in Soss is \emph{declarative}; statements are represented not by the order entered by the user, but by the partial order given by their variable dependencies.
     \item Soss models are typically expressed in terms of \emph{inference combinators} (like ``\jl#For#'') that combine distributions in some way to arrive at a new distribution.
     \item Soss models are \emph{first-class}; models can be passed as arguments to other models, or used in place of distributions within a model.
     \item Soss models are \emph{function-like}; abstractly, a model may be considered a function from its arguments to a joint distribution. In particular, specification of ``observed variables'' is separated from model definition.
@@ -167,12 +167,22 @@ m = @model I,J begin
     \label{fig:model}
 \end{figure}
 
-
+\subsection{Joint Distributions}
 
 \subsection{Inference Primitives}
 
 A given inference algorithm can be expressed in terms of a collection of functions on a model. For example, we may need to evaluate the log-density or its gradient, map continuous variables into $\mathbb{R}^n$, or draw random samples. In Soss, these \emph{inference primitives} generate model-specific code at execution time.
 
+At this writing, the following inference primitive are available:
+
+\begin{description}  
+    \item[\texttt{rand}] draws a random sample from a given joint distribution 
+    \item[\texttt{particles}] uses \emph{systematic sampling}
+    \item[\texttt{logpdf}]
+    \item[\texttt{symlogpdf}] 
+    \item[\texttt{weightedSample}] 
+    \item[\texttt{xform}] 
+\end{description}
 
 \subsection{Model Transformations}
 
