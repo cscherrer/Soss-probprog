@@ -88,8 +88,26 @@ There are many approaches to building a Probabilistic Programming Language (``PP
 \begin{figure}[H]
     \centering
     
-    \begin{subfigure}[b]{0.4\textwidth}
-        \begin{tikzpicture}
+
+    \begin{subfigure}[b]{0.3\textwidth}
+        \[
+    \begin{aligned}
+        \\ i &\in \{1,\cdots,I\}
+        \\ j &\in \{1,\cdots,J\}
+        \\ λ &\sim \text{Cauchy}_+(0,1)
+        \\ \sigma_I &\sim \text{Normal}_+(0,\lambda)
+        \\ \sigma_J &\sim \text{Normal}_+(0,\lambda)
+        \\ \alpha_i &\sim \text{Normal}(0,\sigma_I)
+        \\ \beta_j &\sim \text{Normal}(0,\sigma_J)
+        \\ \hat{y}_{ij} &= \alpha_i + \beta_j
+        \\ y_{ij} &\sim \text{Normal}(\hat{y}_{ij}, \sigma)
+    \end{aligned}
+    \]
+
+    \caption{}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.3\textwidth}
+        \scalebox{0.85}{\begin{tikzpicture}
 
             \node[obs] (y) {$y$};
             \node[det, above=of y] (yhat) {$\hat{y}$};
@@ -110,11 +128,11 @@ There are many approaches to building a Probabilistic Programming Language (``PP
             \plate {I} {(y)(yhat)(alpha)} {$I$};
             \plate {J} {(y)(yhat)(beta)(I.north east)} {$J$};
           
-        \end{tikzpicture}
+        \end{tikzpicture}}
         \caption{}
     \end{subfigure}
     \hspace{0.1in}
-    \begin{subfigure}[b]{0.4\textwidth}
+    \begin{subfigure}[b]{0.3\textwidth}
 
     \begin{minted}{julia}
 m = @model I,J begin
@@ -135,11 +153,11 @@ m = @model I,J begin
     \caption{}
     \end{subfigure}
 
-    \caption{A plate diagram (a) and Soss encoding (b) for a two-way analysis of variance model. Note the specification that $y$ will later be observed is not part of the model, but is instead given at inference time.}
+    \caption{A generative model (a), plate diagram (b), and Soss model (c) for a two-way analysis of variance model. Note the specification that $y$ will later be observed is not part of the model, but is instead given at inference time.}
     \label{fig:model}
 \end{figure}
 
-Figure~\ref{fig:model} shows a plate diagram and Soss implementation of a simplified two-way ANOVA model. The model $m$ has \emph{arguments} $I$ and $J$. Each line of a model is either a \emph{sample statement} (\jl#v ~ rhs#) or an \emph{assign statement} (\jl#v = rhs#). In either case, \jl#v# must be a valid Julia variable name, and \jl#rhs# must be a valid Julia expression. For a sample statement, \jl#rhs# should also be ``distribution-like'', supporting \jl#logpdf# and/or \jl#rand# methods (depending on the inference algorithm to be used).
+Figure~\ref{fig:model} shows a plate diagram and Soss implementation of a simplified two-way ANOVA model. The Soss model $m$ has \emph{arguments} $I$ and $J$. Each line of a model is either a \emph{sample statement} (\jl#v ~ rhs#) or an \emph{assign statement} (\jl#v = rhs#). In either case, \jl#v# must be a valid Julia variable name, and \jl#rhs# must be a valid Julia expression. For a sample statement, \jl#rhs# should also be ``distribution-like'', supporting \jl#logpdf# and/or \jl#rand# methods (depending on the inference algorithm to be used).
 
 \section{Inference Primitives}
 
