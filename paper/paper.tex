@@ -24,6 +24,7 @@
 % \usepackage{unicode-math}
 \usepackage{textgreek}
 \usepackage{minted} 
+\setminted{fontsize=\footnotesize}
 
 
 \urlstyle{tt}
@@ -142,7 +143,7 @@ Figure~\ref{fig:model} shows a plate diagram and Soss implementation of a simpli
 
 \section{Inference Primitives}
 
-A given inference algorithm can be expressed in terms of a collection of functions on a model. For example, we may need to evaluate the log-density or its gradient, map continuous variables into $\mathbb{R}^n$, or draw random samples. In Soss, these \emph{inference primitives} are 
+A given inference algorithm can be expressed in terms of a collection of functions on a model. For example, we may need to evaluate the log-density or its gradient, map continuous variables into $\mathbb{R}^n$, or draw random samples. In Soss, these \emph{inference primitives} generate model-specific code at execution time.
 
 
 \begin{figure}
@@ -185,7 +186,7 @@ julia> markovBlanket(m, :α)
             y ~ For(I, J) do i, j
                     Normal(yhat[i, j], σ)
                 end
-        end
+        end 
 \end{minted}
 
 
@@ -319,37 +320,112 @@ We would like to acknowledge...
 \end{figure}
 
 \section{Symbolic Simplification}
-Before simplification:
-\[
-\begin{aligned}
-    \ell = 
-       &- 3 \log{\left(2 \right)} 
-        - 5 \log{\left(\pi \right)} 
-    \\ &- σ^{2} 
-        - 4 \log{\left(λ \right)} 
-        - 2 \log{\left(λ^{2} + 1 \right)} 
-        - \frac{σ_I^{2}}{λ^{2}} 
-        - \frac{σ_J^{2}}{λ^{2}}
-    \\ &+ \sum_{i=1}^{I} \left(- \log{\left(σ_I \right)} - \frac{\log{\pi }}{2} - \frac{\log{2 }}{2} - \frac{{α}_{i}^{2}}{2 σ_I^{2}}\right) 
-    \\ &+ \sum_{j=1}^{J} \left(- \log{\left(σ_J \right)} - \frac{\log{\pi }}{2} - \frac{\log{2 }}{2} - \frac{{β}_{j}^{2}}{2 σ_J^{2}}\right) 
-    \\ &+ \sum_{\substack{1 \leq i \leq I \\ 1 \leq j \leq J}} \left(- \log{\left(σ \right)} - \frac{\log{\pi }}{2} - \frac{\log{2 }}{2} - \frac{\left({y}_{ij} - {\hat{y}}_{ij}\right)^{2}}{2 σ^{2}}\right) 
-\end{aligned}
-\]
 
-After simplification:
-\[
+\begin{figure}[t!]
+    \centering
+    
+    \begin{subfigure}[t]{0.4\textwidth}
+        \[
+    \begin{aligned}
+        \ell = 
+           &- 3 \log{\left(2 \right)} 
+            - 5 \log{\left(\pi \right)} 
+            - σ^{2} 
+        \\ &- 4 \log{\left(λ \right)} 
+            - 2 \log{\left(λ^{2} + 1 \right)} 
+            - \frac{σ_I^{2}}{λ^{2}} 
+            - \frac{σ_J^{2}}{λ^{2}}
+        \\ &+ \sum_{i=1}^{I} \left(- \log{\left(σ_I \right)} - \frac{\log{\pi }}{2} - \frac{\log{2 }}{2}     - \frac{{α}_{i}^{2}}{2 σ_I^{2}}\right) 
+        \\ &+ \sum_{j=1}^{J} \left(- \log{\left(σ_J \right)} - \frac{\log{\pi }}{2} - \frac{\log{2 }}{2}     - \frac{{β}_{j}^{2}}{2 σ_J^{2}}\right) 
+        \\ &+ \sum_{\substack{1 \leq i \leq I \\ 1 \leq j \leq J}} \left(- \log{\left(σ \right)} - \frac    {\log{\pi }}{2} - \frac{\log{2 }}{2} - \frac{\left({y}_{ij} - {\hat{y}}_{ij}\right)^{2}}{2 σ^{2}    }\right) 
+    \end{aligned}
+    \]
+    \caption{Before}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[t]{0.4\textwidth}
+        \[
     \begin{aligned}
     \ell =
-    &- 7.8 - 0.92 I - 0.92 J - 0.92 I J 
+    &- 7.8 - 0.92 I - 0.92 J - 0.92 I J - σ^{2} 
     \\ &- 4 \log{λ } - 2 \log{\left(λ^{2} + 1 \right)} 
-        - σ^{2} 
         - I J \log{σ } 
     \\ &- I \log{σ_I } - J \log{σ_J } - \frac{σ_I^{2}}{λ^{2}}  - \frac{σ_J^{2}}{λ^{2}}
     \\ &- \frac{1}{2 σ_I^{2}} \sum_{i=1}^{I} {α}_{i}^{2}
         - \frac{1}{2 σ_J^{2}} \sum_{j=1}^{J} {β}_{j}^{2}
-        - \frac{1}{2 σ^{2}} \sum_{\substack{1 \leq i \leq I\\1 \leq j \leq J}} \left({y}_{ij} - {\hat{y}}_{ij}\right)^{2}
+    \\ &- \frac{1}{2 σ^{2}} \sum_{\substack{1 \leq i \leq I\\1 \leq j \leq J}} \left({y}_{ij} - {\hat{y}}_{ij}\right)^{2}
     \end{aligned}
 \]
+    \captionsetup{skip=27pt}
+    \caption{After}
+    \end{subfigure}
+    \caption{Symbolic log-density of $m$ before (a) and after (b) simplification steps. Reduction }
+    \label{}
+\end{figure}
 
+Before simplification:
+
+
+After simplification:
+
+
+
+\section{Extended example }
+\todo[inline]{Break this up! This is just a staging area}
+
+\begin{minted}{julia}
+julia> using Revise, Soss, Random
+
+julia> Random.seed!(1);
+
+julia> m = @model I,J begin
+           λ ~ HalfCauchy()
+           σI ~ HalfNormal(λ)
+           σJ ~ HalfNormal(λ)
+           α ~ Normal(0, σI) |> iid(I)
+           β ~ Normal(0, σJ) |> iid(J)
+           yhat = α .+ β'
+           σ ~ HalfNormal()
+           y ~ For(I,J) do i,j 
+                   Normal(yhat[i,j], σ)
+               end
+       end;
+
+julia> truth = rand(m(I=2,J=3)); pairs(truth);
+
+julia> post = dynamicHMC(m(I=2,J=3), (y=truth.y,));
+
+julia> postpred = predict(m(I=2,J=3), post) |> particles;
+
+julia> postpred.yhat
+2×3 Array{Particles{Float64,1000},2}:
+ 0.241 ± 0.26  0.527 ± 0.3   -0.556 ± 0.38
+ 0.22 ± 0.26   0.506 ± 0.32  -0.577 ± 0.37
+
+julia> postpred.y
+2×3 Array{Particles{Float64,1000},2}:
+ 0.224 ± 0.58  0.529 ± 0.58  -0.58 ± 0.64
+ 0.223 ± 0.56  0.483 ± 0.58  -0.58 ± 0.61
+
+julia> m.args
+2-element Array{Symbol,1}:
+ :I
+ :J
+
+julia> pairs(m.vals)
+pairs(::NamedTuple) with 1 entry:
+  :yhat => :(α .+ β')
+
+julia> pairs(m.dists)
+pairs(::NamedTuple) with 7 entries:
+  :λ  => :(HalfCauchy())
+  :σI => :(HalfNormal(λ))
+  :σJ => :(HalfNormal(λ))
+  :α  => :(Normal(0, σI) |> iid(I))
+  :β  => :(Normal(0, σJ) |> iid(J))
+  :σ  => :(HalfNormal())
+  :y  => :(For(I, J) do i, j…
+
+\end{minted}
 
 \end{document}
