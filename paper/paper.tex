@@ -79,16 +79,17 @@ There are many approaches to building a Probabilistic Programming Language (``PP
 
 \begin{itemize}
     \item Model specification in Soss is \emph{declarative}; statements are ordered not by the order entered by the user, but by the partial order given by their variable dependencies.
+    \item Soss models are typically expressed in terms of \emph{inference combinators} (like ``\jl#For#'') that combine distributions in some way to arrive at a new distribution.
     \item Soss models are \emph{first-class}; models can be passed as arguments to other models, or used in place of distributions within a model.
     \item Soss models are \emph{function-like}; abstractly, a model may be considered a function from its arguments to a joint distribution. In particular, specification of ``observed variables'' is separated from model definition.
-    \item Values and distributions in Soss are represented internally as \emph{abstract syntax trees}, maximizing the flexibility of available inference methods.
+    \item Values and distributions in Soss are represented internally as \emph{abstract syntax trees}, keeping the internal representation close to that given by the user for maximum flexibility.
     \item Soss uses \emph{staged compilation} for inference primitives like \jl#rand# and \jl#logpdf#, via novel \emph{generalized generated functions} from \texttt{GeneralizedGenerated.jl}.
-    \item Model transformations
-    \item Symbolic simplification
-    \item Extensibility
+    \item Soss supports \emph{model transformations}, functions that take a model and return another model.
+    \item Soss supports \emph{symbolic simplifcation}, making it easy to inspect or manipulate a symbolic representation of the log-density, or to use it to generate optimized code.
+    \item Soss is \emph{extensible}; users can define new inference primitives or model transformations externally, and use them as if they had been included in Soss.
 \end{itemize}
 
-Finally, Soss addresses the age-old challenge of naming things in computer science via Cockney rhyming slang (``sauce pan'' rhymes with ``Stan''). {\bf S}oss is {\bf o}pen-{\bf s}ource {\bf s}oftware.
+Finally, Soss addresses the well-known challenge of naming things in computer science via Cockney rhyming slang (``sauce pan'' rhymes with ``Stan''). {\bf S}oss is {\bf o}pen-{\bf s}ource {\bf s}oftware.
 
 \section{Modeling in Soss}
 
