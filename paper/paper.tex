@@ -75,17 +75,24 @@ The approach taken by Soss makes it easy to extend to take advantage of other pa
 
 \section{Introduction}
 
-There are many approaches to building a Probabilistic Programming Language (``PPL''). Soss is distinct from most in a number of ways...
+There are many approaches to building a Probabilistic Programming Language (``PPL''). Soss is distinct from most alternative in a number of ways...
 
+\begin{itemize}
+    \item Model specification in Soss is \emph{declarative}; statements are ordered not by the order entered by the user, but by the partial order given by their variable dependencies.
+    \item Soss models are \emph{first-class}; models can be passed as arguments to other models, or used in place of distributions within a model.
+    \item Values and distributions in Soss are represented internally as \emph{abstract syntax trees}, maximizing the flexibility of available inference methods.
+    \item Code generation \texttt{GeneralizedGenerated.jl}
+    \item Model transformations
+    \item Function-like models
+    \item Symbolic simplification
+    \item Extensibility
+\end{itemize}
 
+\section{Modeling in Soss}
 
+Figure~\ref{fig:model} shows a plate diagram and Soss implementation of a simplified two-way ANOVA model. The Soss model $m$ has \emph{arguments} $I$ and $J$. Each line of a model is either a \emph{sample statement} (\jl#v ~ rhs#) or an \emph{assign statement} (\jl#v = rhs#). In either case, \jl#v# must be a valid Julia variable name, and \jl#rhs# must be a valid Julia expression. For a sample statement, \jl#rhs# should also be ``distribution-like'', supporting \jl#logpdf# and/or \jl#rand# methods (depending on the inference algorithm to be used).
 
-
-
-
-\section{Model syntax}
-
-\begin{figure}[H]
+\begin{figure}[t]
     \centering
     
 
@@ -157,43 +164,24 @@ m = @model I,J begin
     \label{fig:model}
 \end{figure}
 
-Figure~\ref{fig:model} shows a plate diagram and Soss implementation of a simplified two-way ANOVA model. The Soss model $m$ has \emph{arguments} $I$ and $J$. Each line of a model is either a \emph{sample statement} (\jl#v ~ rhs#) or an \emph{assign statement} (\jl#v = rhs#). In either case, \jl#v# must be a valid Julia variable name, and \jl#rhs# must be a valid Julia expression. For a sample statement, \jl#rhs# should also be ``distribution-like'', supporting \jl#logpdf# and/or \jl#rand# methods (depending on the inference algorithm to be used).
 
-\section{Inference Primitives}
+
+\subsection{Inference Primitives}
 
 A given inference algorithm can be expressed in terms of a collection of functions on a model. For example, we may need to evaluate the log-density or its gradient, map continuous variables into $\mathbb{R}^n$, or draw random samples. In Soss, these \emph{inference primitives} generate model-specific code at execution time.
 
 
-\begin{figure}
-    
-    \begin{minted}{julia}
-        julia> truth = rand(m(I=2,J=3)); pairs(truth)
-        pairs(::NamedTuple) with 10 entries:
-          :I    => 2
-          :J    => 3
-          :yhat => [0.0996722 0.720247 -0.706772; 0.100505 0.72108 -0.705939]
-          :σ    => 0.297288
-          :λ    => 0.523386
-          :σJ   => 0.312794
-          :σI   => 0.0054669
-          :β    => [0.0973136, 0.717889, -0.70913]
-          :α    => [0.00235854, 0.00319107]
-          :y    => [0.386041 0.564963 -0.72177; 0.236898 0.842491 -0.912154]
-    \end{minted}
-    
-\end{figure}
-
-\section{Model Transformations}
+\subsection{Model Transformations}
 
 
-\subsection{Conditional Predictive models}
+\subsubsection*{Conditional predictive models}
 
 
 
 
-\subsection{Causal Interventions (``Do'' operator)}
+\subsubsection*{Causal interventions (``Do'' operator)}
 
-\subsection{Markov Blankets}
+\subsubsection*{Markov blankets}
 
 
 \begin{minted}{julia}
@@ -208,11 +196,11 @@ julia> markovBlanket(m, :α)
 \end{minted}
 
 
-\section{Symbolic Manipulation}
+\subsection{Symbolic Manipulation}
 
-\subsection{Symbolic Log-density}
+\subsubsection*{Symbolic Log-density}
 
-\subsection{Code Generation}
+\subsubsection*{Code Generation}
 
 \section{Implementation}
 
