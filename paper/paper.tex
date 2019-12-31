@@ -29,7 +29,7 @@
 \urlstyle{tt}
 \citestyle{acmauthoryear}
  
-
+\newmintinline[jl]{julia}{}
 \begin{document}
 
 \title{Soss}
@@ -65,7 +65,7 @@
 %\renewcommand\shortauthors{Mage, M. et al}
 
 \begin{abstract}
-We present Soss, a probabilistic programming language embedded in the Julia language. Soss represents statistical models in terms of abstract syntax trees, and uses staged compilation for on-demand generation of ``inference primitives'' (random sampling, log-density, etc) without requiring casual users to worry about such details.
+We present Soss, a declarative probabilistic programming language embedded in the Julia language. Soss represents statistical models in terms of abstract syntax trees, and uses staged compilation for on-demand generation of ``inference primitives'' (random sampling, log-density, etc) without requiring casual users to worry about such details.
 
 The approach taken by Soss makes it easy to extend to take advantage of other packages in the rapidly-growing Julia ecosystem. At the time of this writing, Soss users can choose from several inference back-ends and connect easily with larger systems SymPy and Gen.
 \end{abstract}
@@ -76,7 +76,13 @@ The approach taken by Soss makes it easy to extend to take advantage of other pa
 
 There are many approaches to building a Probabilistic Programming Language (``PPL''). Soss is distinct from most in a number of ways...
 
-Here's some example code. Lots of dead space on the right, maybe want to try to keep code in a multi-column figure
+
+
+
+
+
+
+\section{Model syntax}
 
 \begin{figure}[H]
     \centering
@@ -128,20 +134,38 @@ m = @model I,J begin
     \caption{}
     \end{subfigure}
 
-    \caption{A plate diagram (a) and Soss encoding (b) for a two-way analysis of variance model.}
-    \label{}
+    \caption{A plate diagram (a) and Soss encoding (b) for a two-way analysis of variance model. Note the specification that $y$ will later be observed is not part of the model, but is instead given at inference time.}
+    \label{fig:model}
 \end{figure}
 
+Figure~\ref{fig:model} shows a plate diagram and Soss implementation of a simplified two-way ANOVA model. The model $m$ has \emph{arguments} $I$ and $J$. Each line of a model is either a \emph{sample statement} (\jl#v ~ rhs#) or an \emph{assign statement} (\jl#v = rhs#). In either case, \jl#v# must be a valid Julia variable name, and \jl#rhs# must be a valid Julia expression. For a sample statement, \jl#rhs# should also be ``distribution-like'', supporting \jl#logpdf# and/or \jl#rand# methods (depending on the inference algorithm to be used).
+
+\section{Inference Primitives}
+
+A given inference algorithm can be expressed in terms of a collection of functions on a model. For example, we may need to evaluate the log-density or its gradient, map continuous variables into $\mathbb{R}^n$, or draw random samples. In Soss, these \emph{inference primitives} are 
 
 
-
-\section{Model syntax}
-
- 
+\begin{figure}
+    
+    \begin{minted}{julia}
+        julia> truth = rand(m(I=2,J=3)); pairs(truth)
+        pairs(::NamedTuple) with 10 entries:
+          :I    => 2
+          :J    => 3
+          :yhat => [0.0996722 0.720247 -0.706772; 0.100505 0.72108 -0.705939]
+          :σ    => 0.297288
+          :λ    => 0.523386
+          :σJ   => 0.312794
+          :σI   => 0.0054669
+          :β    => [0.0973136, 0.717889, -0.70913]
+          :α    => [0.00235854, 0.00319107]
+          :y    => [0.386041 0.564963 -0.72177; 0.236898 0.842491 -0.912154]
+    \end{minted}
+    
+\end{figure}
 
 \section{Model Transformations}
 
-\subsection{Markov Blankets}
 
 \subsection{Conditional Predictive models}
 
@@ -150,40 +174,24 @@ m = @model I,J begin
 
 \subsection{Causal Interventions (``Do'' operator)}
 
+\subsection{Markov Blankets}
+
+
+\begin{minted}{julia}
+julia> markovBlanket(m, :α)
+    @model (I, σI, β, σ, J) begin
+            α ~ Normal(0, σI) |> iid(I)
+            yhat = α .+ β'
+            y ~ For(I, J) do i, j
+                    Normal(yhat[i, j], σ)
+                end
+        end
+\end{minted}
+
+
 \section{Symbolic Manipulation}
 
 \subsection{Symbolic Log-density}
-
-\[
-\begin{aligned}
-    \ell = 
-       &- 3 \log{\left(2 \right)} 
-        - 5 \log{\left(\pi \right)} 
-    \\ &- σ^{2} 
-        - 4 \log{\left(λ \right)} 
-        - 2 \log{\left(λ^{2} + 1 \right)} 
-        - \frac{σ_I^{2}}{λ^{2}} 
-        - \frac{σ_J^{2}}{λ^{2}}
-    \\ &+ \sum_{i=1}^{I} \left(- \log{\left(σ_I \right)} - \frac{\log{\pi }}{2} - \frac{\log{2 }}{2} - \frac{{α}_{i}^{2}}{2 σ_I^{2}}\right) 
-    \\ &+ \sum_{j=1}^{J} \left(- \log{\left(σ_J \right)} - \frac{\log{\pi }}{2} - \frac{\log{2 }}{2} - \frac{{β}_{j}^{2}}{2 σ_J^{2}}\right) 
-    \\ &+ \sum_{\substack{1 \leq i \leq I \\ 1 \leq j \leq J}} \left(- \log{\left(σ \right)} - \frac{\log{\pi }}{2} - \frac{\log{2 }}{2} - \frac{\left({y}_{ij} - {\hat{y}}_{ij}\right)^{2}}{2 σ^{2}}\right) 
-\end{aligned}
-\]
-
-
-\[
-    \begin{aligned}
-    \ell =
-    &- 7.8 - 0.92 I - 0.92 J - 0.92 I J 
-    \\ &- 4 \log{λ } - 2 \log{\left(λ^{2} + 1 \right)} 
-        - σ^{2} 
-        - I J \log{σ } 
-    \\ &- I \log{σ_I } - J \log{σ_J } - \frac{σ_I^{2}}{λ^{2}}  - \frac{σ_J^{2}}{λ^{2}}
-    \\ &- \frac{1}{2 σ_I^{2}} \sum_{i=1}^{I} {α}_{i}^{2}
-        - \frac{1}{2 σ_J^{2}} \sum_{j=1}^{J} {β}_{j}^{2}
-        - \frac{1}{2 σ^{2}} \sum_{\substack{1 \leq i \leq I\\1 \leq j \leq J}} \left({y}_{ij} - {\hat{y}}_{ij}\right)^{2}
-    \end{aligned}
-\]
 
 \subsection{Code Generation}
 
@@ -310,6 +318,38 @@ We would like to acknowledge...
   \Description{Placeholder figure.}
 \end{figure}
 
+\section{Symbolic Simplification}
+Before simplification:
+\[
+\begin{aligned}
+    \ell = 
+       &- 3 \log{\left(2 \right)} 
+        - 5 \log{\left(\pi \right)} 
+    \\ &- σ^{2} 
+        - 4 \log{\left(λ \right)} 
+        - 2 \log{\left(λ^{2} + 1 \right)} 
+        - \frac{σ_I^{2}}{λ^{2}} 
+        - \frac{σ_J^{2}}{λ^{2}}
+    \\ &+ \sum_{i=1}^{I} \left(- \log{\left(σ_I \right)} - \frac{\log{\pi }}{2} - \frac{\log{2 }}{2} - \frac{{α}_{i}^{2}}{2 σ_I^{2}}\right) 
+    \\ &+ \sum_{j=1}^{J} \left(- \log{\left(σ_J \right)} - \frac{\log{\pi }}{2} - \frac{\log{2 }}{2} - \frac{{β}_{j}^{2}}{2 σ_J^{2}}\right) 
+    \\ &+ \sum_{\substack{1 \leq i \leq I \\ 1 \leq j \leq J}} \left(- \log{\left(σ \right)} - \frac{\log{\pi }}{2} - \frac{\log{2 }}{2} - \frac{\left({y}_{ij} - {\hat{y}}_{ij}\right)^{2}}{2 σ^{2}}\right) 
+\end{aligned}
+\]
 
-Authors may provide appendices to accompany their extended abstract submissions. Please note however that reviewers will not be required to comment on material in these appendices.
+After simplification:
+\[
+    \begin{aligned}
+    \ell =
+    &- 7.8 - 0.92 I - 0.92 J - 0.92 I J 
+    \\ &- 4 \log{λ } - 2 \log{\left(λ^{2} + 1 \right)} 
+        - σ^{2} 
+        - I J \log{σ } 
+    \\ &- I \log{σ_I } - J \log{σ_J } - \frac{σ_I^{2}}{λ^{2}}  - \frac{σ_J^{2}}{λ^{2}}
+    \\ &- \frac{1}{2 σ_I^{2}} \sum_{i=1}^{I} {α}_{i}^{2}
+        - \frac{1}{2 σ_J^{2}} \sum_{j=1}^{J} {β}_{j}^{2}
+        - \frac{1}{2 σ^{2}} \sum_{\substack{1 \leq i \leq I\\1 \leq j \leq J}} \left({y}_{ij} - {\hat{y}}_{ij}\right)^{2}
+    \end{aligned}
+\]
+
+
 \end{document}
