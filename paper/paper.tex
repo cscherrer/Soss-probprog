@@ -44,8 +44,8 @@
   \institution{RelationalAI}
   % \department{Department of Brain and Cognitive Sciences}
   %\streetaddress{43 Vassar St}
-  %\city{Cambridge}
-  %\state{MA}
+  \city{Seattle}
+  \state{WA}
   %\postcode{02139}
   %\country{USA}
 }
@@ -80,13 +80,15 @@ There are many approaches to building a Probabilistic Programming Language (``PP
 \begin{itemize}
     \item Model specification in Soss is \emph{declarative}; statements are ordered not by the order entered by the user, but by the partial order given by their variable dependencies.
     \item Soss models are \emph{first-class}; models can be passed as arguments to other models, or used in place of distributions within a model.
+    \item Soss models are \emph{function-like}; abstractly, a model may be considered a function from its arguments to a joint distribution. In particular, specification of ``observed variables'' is separated from model definition.
     \item Values and distributions in Soss are represented internally as \emph{abstract syntax trees}, maximizing the flexibility of available inference methods.
-    \item Code generation \texttt{GeneralizedGenerated.jl}
+    \item Soss uses \emph{staged compilation} for inference primitives like \jl#rand# and \jl#logpdf#, via novel \emph{generalized generated functions} from \texttt{GeneralizedGenerated.jl}.
     \item Model transformations
-    \item Function-like models
     \item Symbolic simplification
     \item Extensibility
 \end{itemize}
+
+Finally, Soss addresses the age-old challenge of naming things in computer science via Cockney rhyming slang (``sauce pan'' rhymes with ``Stan''). {\bf S}oss is {\bf o}pen-{\bf s}ource {\bf s}oftware.
 
 \section{Modeling in Soss}
 
