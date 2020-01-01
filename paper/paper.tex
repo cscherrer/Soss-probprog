@@ -169,16 +169,20 @@ m = @model I,J begin
 
 \subsection{Joint Distributions}
 
+
+
 \subsection{Inference Primitives}
 
 A given inference algorithm can be expressed in terms of a collection of functions on a model. For example, we may need to evaluate the log-density or its gradient, map continuous variables into $\mathbb{R}^n$, or draw random samples. In Soss, these \emph{inference primitives} generate model-specific code at execution time.
 
 At this writing, the following inference primitive are available:
 
+\todo[inline]{citation for MonteCarloMeasurements.jl}
+
 \begin{description}  
-    \item[\texttt{rand}] draws a random sample from a given joint distribution 
-    \item[\texttt{particles}] uses \emph{systematic sampling}
-    \item[\texttt{logpdf}]
+    \item[\texttt{rand}] draws a random sample from a given joint distribution.
+    \item[\texttt{particles}] draws a \emph{systematic sample} from a given joint distribution, using \texttt{MonteCarloMeasurements.jl}.
+    \item[\texttt{logpdf}] takes a joint distribution and a point in its sample space, and returns the log-density.
     \item[\texttt{symlogpdf}] 
     \item[\texttt{weightedSample}] 
     \item[\texttt{xform}] 
