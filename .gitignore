@@ -11,3 +11,4 @@ paper/comment.cut
 *.synctex.gz
 *.log
 .vscode/settings.json
+paper/_minted-paper
