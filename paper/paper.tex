@@ -169,30 +169,34 @@ m = @model I,J begin
 
 \subsection{Joint Distributions}
 
-A Soss model is \emph{function-like}, taking values for its arguments and returning a \emph{joint distribution}. For example, given \jl#m# from Figure~\ref{fig:model}, we can build the joint distribution \jl#d=m(I=2, J=3)#. This supports the usual \jl#rand# and \jl#logpdf# functions, as well as some others provided by Soss described in the following sections. For example,\footnote{This and future examples are edited for space, for example rounding floating point values.}
+A Soss model is \emph{function-like}, taking values for its arguments and returning a \emph{joint distribution}. For example, given \jl#m# from Figure~\ref{fig:model}, we can build the joint distribution \jl#d=m(I=2, J=3)#. This supports the usual \jl#rand# and \jl#logpdf# functions, as well as some others provided by Soss described in the following sections. For example,\footnote{This and future outputs are lightly edited for space, for example rounding floating point values.}
 
 \begin{minted}{julia}
-julia> d = m(I=2, J=3); rand(d) # or rand(m(I=2, J=3))
+julia> d = m(I=2, J=3); rand(d) # or just rand(m(I=2, J=3))
 (I = 2, J = 3, yhat = [-0.52 -1.5 0.0037; -0.81 -1.85 -0.28], σ = 2.5, λ = 1.3, σJ = 0.72, σI = 0.41, 
  β = [-0.54, -1.5, -0.023], α = [0.026, -0.26], y = [-0.45 -2.0 2.2; -3.4 -3.9 2.3])
 \end{minted}
 
 \subsection{Inference Primitives}
 
-A given inference algorithm can be expressed in terms of a collection of functions on a model. For example, we may need to evaluate the log-density or its gradient, map continuous variables into $\mathbb{R}^n$, or draw random samples. In Soss, these \emph{inference primitives} generate model-specific code at execution time.
+A given inference algorithm can be expressed in terms of a collection of functions on a model or joint distribution. For example, we often need to evaluate the log-density or its gradient, map continuous variables into $\mathbb{R}^n$, or draw random samples. In Soss, these \emph{inference primitives} generate model-specific code at execution time.
 
 At this writing, the following inference primitive are available:
 
-\todo[inline]{citation for MonteCarloMeasurements.jl}
-
 \begin{description}  
-    \item[\texttt{rand}] draws a random sample from a given joint distribution.
-    \item[\texttt{particles}] draws a \emph{systematic sample} from a given joint distribution, using \texttt{MonteCarloMeasurements.jl}.
-    \item[\texttt{logpdf}] takes a joint distribution and a point in its sample space, and returns the log-density.
+    \item[\texttt{rand}] draws a random point or sample from a given distribution.
+    \item[\texttt{particles}] draws a \emph{systematic sample}, as described in \cite{Douc2005}.
+    \item[\texttt{logpdf}] takes a distribution and a point, and returns the log-density at that point.
+    \item[\texttt{xform}] takes a distribution and some known data, and returns a bijection from $\mathbb{R}^n$ to the space of unknowns. This is useful for algorithms like Hamiltonian Monte Carlo \cite{Neal2011}.
     \item[\texttt{symlogpdf}] 
-    \item[\texttt{weightedSample}] 
-    \item[\texttt{xform}] 
+    \item[\texttt{codegen}]  
 \end{description}
+
+In the above, a \emph{distribution} refers to a joint distribution, while \emph{point} refers to a named tuple in the space space of a given distribution.
+
+\todo[inline]{cite MonteCarloMeasurements.jl and TransformVariables.jl}
+
+Users may add more
 
 \subsection{Model Transformations}
 
