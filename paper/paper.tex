@@ -149,7 +149,7 @@ m = @model I,J begin
     λ ~ HalfCauchy()
     σI ~ HalfNormal(λ)
     σJ ~ HalfNormal(λ)
-    
+     
     α ~ Normal(0, σI) |> iid(I)
     β ~ Normal(0, σJ) |> iid(J)
     yhat = α .+ β'
