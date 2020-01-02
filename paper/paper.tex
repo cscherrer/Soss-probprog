@@ -196,21 +196,15 @@ In the above, a \emph{distribution} refers to a joint distribution, while \emph{
 
 \todo[inline]{cite MonteCarloMeasurements.jl and TransformVariables.jl}
 
-Users may add more
+The set of inference primitives is not fixed, but can be extended by users. New primitives can be added in outside packages, and does not require making changes to the Soss codebase. 
 
 \subsection{Functions on Models}
 
-arguments
-sampled
-assigned
-parameters
-variables
+Soss includes several functions for querying sets of variables associated with a model. As described above, models are function-like, with the inputs given by {\bf \texttt{arguments}}. In the body of a model every statement declares that some variable is either {\bf \texttt{sampled}} or {\bf \texttt{assigned}}. The sampled and assigned variables together comprise the {\bf \texttt{parameters}}, and all of the above are {\bf \texttt{variables}}. Each of these is a Soss function that takes a model and returns a vector of distinct Julia symbols.
 
-toposort
-poset
-digraph
+Soss ignores the ordering of statements given by the user, instead working in terms of the DAG ordering. You can access this graph with {\bf \texttt{digraph}}, or use {\bf \texttt{poset}} to get the partial order. Finally, {\bf \texttt{toposort}} returns a topologically-ordered vector of the parameters. Each of these three functions takes a model as input.
 
-
+\todo[inline]{Cite SimplePosets and SimpleGraphs}
 
 \subsection{Model Transformations}
 
