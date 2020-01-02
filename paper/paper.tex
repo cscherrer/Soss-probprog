@@ -192,11 +192,15 @@ At this writing, the following inference primitive are available:
     \item[\texttt{codegen}] calls \jl#symlogpdf#, and uses the result to generate a more efficient version of \jl#logpdf#.
 \end{description}
 
-In the above, a \emph{distribution} refers to a joint distribution, while \emph{point} refers to a named tuple in the space space of a given distribution.
+In the above, a \emph{distribution} refers to a joint distribution, while \emph{point} refers to a named tuple in the space space of a distribution.
 
 \todo[inline]{cite MonteCarloMeasurements.jl and TransformVariables.jl}
 
 The set of inference primitives is not fixed, but can be extended by users. New primitives can be added in outside packages, and does not require making changes to the Soss codebase. 
+
+\subsection{Inference}
+
+\jl#DynamicHMC.jl# \cite{tamas_k_papp_2019_3590018}
 
 \subsection{Functions on Models}
 
@@ -204,7 +208,8 @@ Soss includes several functions for querying sets of variables associated with a
 
 Soss ignores the ordering of statements given by the user, instead working in terms of the DAG ordering. You can access this graph with {\bf \texttt{digraph}}, or use {\bf \texttt{poset}} to get the partial order. Finally, {\bf \texttt{toposort}} returns a topologically-ordered vector of the parameters. Each of these three functions takes a model as input.
 
-\todo[inline]{Cite SimplePosets and SimpleGraphs}
+Soss represents and manipulates variable dependencies using \jl#SimpleGraphs#, \jl#SimplePosets#, and \jl#SimplePartitions# from \cite{SimpleWorld}.
+
 
 \subsection{Model Transformations}
 
