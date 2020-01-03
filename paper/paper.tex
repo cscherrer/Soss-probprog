@@ -25,7 +25,8 @@
 \usepackage{textgreek}
 \usepackage{minted} 
 \setminted{fontsize=\footnotesize}
-
+\usepackage{newunicodechar}
+\newunicodechar{ℓ}{\ensuremath{\ell}}
 
 \urlstyle{tt}
 \citestyle{acmauthoryear}
@@ -200,7 +201,7 @@ The set of inference primitives is not fixed, but can be extended by users. New 
 
 \subsection{Inference}
 
-\jl#DynamicHMC.jl# \cite{tamas_k_papp_2019_3590018}
+Together with automatic differentiation, the above inference primitives enable a wide variety of inference algorithms. Rather than building such algorithms specific to Soss, we defer this to external packages. So far, our focus has been Hamiltonian Monte Carlo \cite{Neal2011}, as implemented in \jl#DynamicHMC.jl# \cite{tamas_k_papp_2019_3590018} and \jl#AdvancedHMC.jl# \cite{ge2018t}; Soss has interfaces to these in the {\bf \texttt{dynamicHMC}} and {\bf \texttt{advancedHMC}} functions, respectively.
 
 \subsection{Functions on Models}
 
@@ -229,13 +230,6 @@ struct Model{A,B,M}
     retn  :: Union{Nothing, Symbol, Expr}
 end
 \end{minted}
-
-
-\section{Performance}
-
-\todo[inline]{Let's implement models from \url{https://statisticalrethinkingjulia.github.io/MCMCBenchmarks.jl/latest/benchmarks/} for benchmark comparisons}
-
-\todo[inline]{Can Soss really generate arbitrary code?}
 
 The ability to generate arbitrary  Julia code makes it difficult to measure performance in Soss. When a performance bottleneck is found, developers or users can ask Soss to generate something different. This design places no a priori constraints on performance.
 
@@ -363,7 +357,7 @@ We would like to acknowledge...
         \\ &+ \sum_{\substack{1 \leq i \leq I \\ 1 \leq j \leq J}} \left(- \log{\left(σ \right)} - \frac    {\log{\pi }}{2} - \frac{\log{2 }}{2} - \frac{\left({y}_{ij} - {\hat{y}}_{ij}\right)^{2}}{2 σ^{2}    }\right) 
     \end{aligned}
     \]
-    \caption{Before}
+    \caption{Direct implementation}
     \end{subfigure}
     \hfill
     \begin{subfigure}[t]{0.4\textwidth}
@@ -380,16 +374,58 @@ We would like to acknowledge...
     \end{aligned}
 \]
     \captionsetup{skip=27pt}
-    \caption{After}
+    \caption{After symbolic simplification}
     \end{subfigure}
-    \caption{Symbolic log-density of $m$ before (a) and after (b) simplification steps. Reduction }
+    \caption{Symbolic log-density of $m$ before (a) and after (b) simplification steps.}
     \label{}
 \end{figure}
 
-Before simplification:
+\begin{figure}[t]
+\centering
+\begin{subfigure}[t]{0.48\textwidth}
+\begin{minted}{julia}
+julia> Soss.sourceRand()(m)
+quote
+    σ = rand(HalfNormal())
+    λ = rand(HalfCauchy())
+    σJ = rand(HalfNormal(λ))
+    σI = rand(HalfNormal(λ))
+    β = rand(iid(J, Normal(0, σJ)))
+    α = rand(iid(I, Normal(0, σI)))
+    yhat = α .+ β'
+    y = rand(For(I, J) do i, j
+                Normal(yhat[i, j], σ)
+            end)
+    (I=I, J=J, yhat=yhat, λ=λ, σI=σI, 
+    σJ=σJ, α=α, β=β, σ=σ, y=y) 
+end
+\end{minted}
+\caption{\footnotesize{\texttt{rand}}}
+\end{subfigure}
+\begin{subfigure}[t]{0.48\textwidth}
+\begin{minted}{julia}
+julia> Soss.sourceLogpdf()(m)
+quote
+    _ℓ = 0.0
+    _ℓ += logpdf(HalfNormal(), σ)
+    _ℓ += logpdf(HalfCauchy(), λ)
+    _ℓ += logpdf(HalfNormal(λ), σJ)
+    _ℓ += logpdf(HalfNormal(λ), σI)
+    _ℓ += logpdf(Normal(0, σJ) |> iid(J), β)
+    _ℓ += logpdf(Normal(0, σI) |> iid(I), α)
+    yhat = α .+ β'
+    _ℓ += logpdf(For(I, J) do i, j
+                Normal(yhat[i, j], σ)
+            end, y)
+    return _ℓ
+end
+\end{minted}
+\caption{\footnotesize{\texttt{logpdf}}}
+\end{subfigure}
+\caption{Generated code when calling \footnotesize{\texttt{rand(m)}} and \footnotesize{\texttt{logpdf(m,x)}}.} 
+\label{} 
+\end{figure}
 
-
-After simplification:
 
 
 
