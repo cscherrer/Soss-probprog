@@ -25,7 +25,8 @@
 \usepackage{textgreek}
 \usepackage{minted} 
 \setminted{fontsize=\footnotesize}
-
+\usepackage{newunicodechar}
+\newunicodechar{ℓ}{\ensuremath{\ell}}
 
 \urlstyle{tt}
 \citestyle{acmauthoryear}
@@ -44,8 +45,8 @@
   \institution{RelationalAI}
   % \department{Department of Brain and Cognitive Sciences}
   %\streetaddress{43 Vassar St}
-  %\city{Cambridge}
-  %\state{MA}
+  \city{Seattle}
+  \state{WA}
   %\postcode{02139}
   %\country{USA}
 }
@@ -75,21 +76,49 @@ The approach taken by Soss makes it easy to extend to take advantage of other pa
 
 \section{Introduction}
 
-There are many approaches to building a Probabilistic Programming Language (``PPL''). Soss is distinct from most in a number of ways...
+There are many approaches to building a Probabilistic Programming Language (``PPL''). Soss is distinct from most alternatives in a number of ways:
 
+\begin{itemize}
+    \item Model specification in Soss is \emph{declarative}; statements are represented not by the order entered by the user, but by the partial order given by their variable dependencies.
+    \item Soss models are typically expressed in terms of \emph{inference combinators} (like ``\jl#For#'') that combine distributions in some way to arrive at a new distribution.
+    \item Soss models are \emph{first-class}; models can be passed as arguments to other models, or used in place of distribution functions like \jl#Normal# within a model.
+    \item Soss models are \emph{function-like}; abstractly, a model may be considered a function from its arguments to a joint distribution. In particular, specification of ``observed variables'' is separated from model definition.
+    \item Values and distributions in Soss are represented internally as \emph{abstract syntax trees}, keeping the internal representation close to that given by the user for maximum flexibility.
+    \item Soss uses \emph{staged compilation} for inference primitives like \jl#rand# and \jl#logpdf#, via novel \emph{generalized generated functions} from \jl#GeneralizedGenerated.jl#.
+    \item Soss supports \emph{model transformations}, functions that take a model and return another model.
+    \item Soss supports \emph{symbolic simplifcation}, making it easy to inspect or manipulate a symbolic representation of the log-density, or to use it to generate optimized code.
+    \item Soss is \emph{extensible}; users can define new inference primitives or model transformations externally, and use them as if they had been included in Soss.
+\end{itemize}
 
+Finally, Soss uses Cockney rhyming slang to address the well-known challenge of naming things in computer science (``sauce pan'' rhymes with ``Stan''). {\bf S}oss is {\bf o}pen-{\bf s}ource {\bf s}oftware.
 
+\section{Modeling in Soss}
 
+Figure~\ref{fig:model} shows a plate diagram and Soss implementation of a simplified two-way ANOVA model. The Soss model $m$ has \emph{arguments} $I$ and $J$. Each line of a model is either a \emph{sample statement} (\jl#v ~ rhs#) or an \emph{assign statement} (\jl#v = rhs#). In either case, \jl#v# must be a valid Julia variable name, and \jl#rhs# must be a valid Julia expression. For a sample statement, \jl#rhs# should also be ``distribution-like'', supporting \jl#logpdf# and/or \jl#rand# methods (depending on the inference algorithm to be used).
 
-
-
-\section{Model syntax}
-
-\begin{figure}[H]
+\begin{figure}[t]
     \centering
     
-    \begin{subfigure}[b]{0.4\textwidth}
-        \begin{tikzpicture}
+
+    \begin{subfigure}[b]{0.3\textwidth}
+        \[
+    \begin{aligned}
+        \\ i &\in \{1,\cdots,I\}
+        \\ j &\in \{1,\cdots,J\}
+        \\ λ &\sim \text{Cauchy}_+(0,1)
+        \\ \sigma_I &\sim \text{Normal}_+(0,\lambda)
+        \\ \sigma_J &\sim \text{Normal}_+(0,\lambda)
+        \\ \alpha_i &\sim \text{Normal}(0,\sigma_I)
+        \\ \beta_j &\sim \text{Normal}(0,\sigma_J)
+        \\ \hat{y}_{ij} &= \alpha_i + \beta_j
+        \\ y_{ij} &\sim \text{Normal}(\hat{y}_{ij}, \sigma)
+    \end{aligned}
+    \]
+
+    \caption{}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.3\textwidth}
+        \scalebox{0.85}{\begin{tikzpicture}
 
             \node[obs] (y) {$y$};
             \node[det, above=of y] (yhat) {$\hat{y}$};
@@ -110,18 +139,18 @@ There are many approaches to building a Probabilistic Programming Language (``PP
             \plate {I} {(y)(yhat)(alpha)} {$I$};
             \plate {J} {(y)(yhat)(beta)(I.north east)} {$J$};
           
-        \end{tikzpicture}
+        \end{tikzpicture}}
         \caption{}
     \end{subfigure}
     \hspace{0.1in}
-    \begin{subfigure}[b]{0.4\textwidth}
+    \begin{subfigure}[b]{0.3\textwidth}
 
     \begin{minted}{julia}
 m = @model I,J begin
     λ ~ HalfCauchy()
     σI ~ HalfNormal(λ)
     σJ ~ HalfNormal(λ)
-    
+     
     α ~ Normal(0, σI) |> iid(I)
     β ~ Normal(0, σJ) |> iid(J)
     yhat = α .+ β'
@@ -135,66 +164,61 @@ m = @model I,J begin
     \caption{}
     \end{subfigure}
 
-    \caption{A plate diagram (a) and Soss encoding (b) for a two-way analysis of variance model. Note the specification that $y$ will later be observed is not part of the model, but is instead given at inference time.}
+    \caption{A generative model (a), plate diagram (b), and Soss model (c) for a two-way analysis of variance model. Note the specification that $y$ will later be observed is not part of the model, but is instead given at inference time.}
     \label{fig:model}
 \end{figure}
 
-Figure~\ref{fig:model} shows a plate diagram and Soss implementation of a simplified two-way ANOVA model. The model $m$ has \emph{arguments} $I$ and $J$. Each line of a model is either a \emph{sample statement} (\jl#v ~ rhs#) or an \emph{assign statement} (\jl#v = rhs#). In either case, \jl#v# must be a valid Julia variable name, and \jl#rhs# must be a valid Julia expression. For a sample statement, \jl#rhs# should also be ``distribution-like'', supporting \jl#logpdf# and/or \jl#rand# methods (depending on the inference algorithm to be used).
+\subsection{Joint Distributions}
 
-\section{Inference Primitives}
-
-A given inference algorithm can be expressed in terms of a collection of functions on a model. For example, we may need to evaluate the log-density or its gradient, map continuous variables into $\mathbb{R}^n$, or draw random samples. In Soss, these \emph{inference primitives} generate model-specific code at execution time.
-
-
-\begin{figure}
-    
-    \begin{minted}{julia}
-        julia> truth = rand(m(I=2,J=3)); pairs(truth)
-        pairs(::NamedTuple) with 10 entries:
-          :I    => 2
-          :J    => 3
-          :yhat => [0.0996722 0.720247 -0.706772; 0.100505 0.72108 -0.705939]
-          :σ    => 0.297288
-          :λ    => 0.523386
-          :σJ   => 0.312794
-          :σI   => 0.0054669
-          :β    => [0.0973136, 0.717889, -0.70913]
-          :α    => [0.00235854, 0.00319107]
-          :y    => [0.386041 0.564963 -0.72177; 0.236898 0.842491 -0.912154]
-    \end{minted}
-    
-\end{figure}
-
-\section{Model Transformations}
-
-
-\subsection{Conditional Predictive models}
-
-
-
-
-\subsection{Causal Interventions (``Do'' operator)}
-
-\subsection{Markov Blankets}
-
+A Soss model is \emph{function-like}, taking values for its arguments and returning a \emph{joint distribution}. For example, given \jl#m# from Figure~\ref{fig:model}, we can build the joint distribution \jl#d=m(I=2, J=3)#. This supports the usual \jl#rand# and \jl#logpdf# functions, as well as some others provided by Soss described in the following sections. For example,\footnote{This and future outputs are lightly edited for space, for example rounding floating point values.}
 
 \begin{minted}{julia}
-julia> markovBlanket(m, :α)
-    @model (I, σI, β, σ, J) begin
-            α ~ Normal(0, σI) |> iid(I)
-            yhat = α .+ β'
-            y ~ For(I, J) do i, j
-                    Normal(yhat[i, j], σ)
-                end
-        end 
+julia> d = m(I=2, J=3); rand(d) # or just rand(m(I=2, J=3))
+(I = 2, J = 3, yhat = [-0.52 -1.5 0.0037; -0.81 -1.85 -0.28], σ = 2.5, λ = 1.3, σJ = 0.72, σI = 0.41, 
+ β = [-0.54, -1.5, -0.023], α = [0.026, -0.26], y = [-0.45 -2.0 2.2; -3.4 -3.9 2.3])
 \end{minted}
 
+\subsection{Inference Primitives}
 
-\section{Symbolic Manipulation}
+A given inference algorithm can be expressed in terms of a collection of functions on a model or joint distribution. For example, we often need to evaluate the log-density or its gradient  or draw random samples. In Soss, these \emph{inference primitives} generate model-specific code at execution time.
 
-\subsection{Symbolic Log-density}
+At this writing, the following inference primitive are available:
 
-\subsection{Code Generation}
+\begin{description}  
+    \item[\texttt{rand}] draws a random point or sample from a given distribution.
+    \item[\texttt{particles}] draws a \emph{systematic sample}, as described in \cite{Douc2005}.
+    \item[\texttt{logpdf}] takes a distribution and a point, and returns the log-density at that point.
+    \item[\texttt{xform}] takes a distribution and some known data, and returns a bijection from $\mathbb{R}^n$ to the space of unknowns. This is useful for algorithms like Hamiltonian Monte Carlo \cite{Neal2011}.
+    \item[\texttt{symlogpdf}] takes a model, and returns a SymPy \cite{10.7717/peerj-cs.103} representation of the log-density, with some additional Julia-based simplifications.
+    \item[\texttt{codegen}] calls \jl#symlogpdf#, and uses the result to generate a more efficient version of \jl#logpdf#.
+\end{description}
+
+In the above, a \emph{distribution} refers to a joint distribution, while \emph{point} refers to a named tuple in the space space of a distribution.
+
+\todo[inline]{cite MonteCarloMeasurements.jl and TransformVariables.jl}
+
+The set of inference primitives is not fixed, but can be extended by users. New primitives can be added in outside packages, and does not require making changes to the Soss codebase. 
+
+\subsection{Inference}
+
+Together with automatic differentiation, the above inference primitives enable a wide variety of inference algorithms. Rather than building such algorithms specific to Soss, we defer this to external packages. So far, our focus has been Hamiltonian Monte Carlo \cite{Neal2011}, as implemented in \jl#DynamicHMC.jl# \cite{tamas_k_papp_2019_3590018} and \jl#AdvancedHMC.jl# \cite{ge2018t}; Soss has interfaces to these in the {\bf \texttt{dynamicHMC}} and {\bf \texttt{advancedHMC}} functions, respectively.
+
+\subsection{Functions on Models}
+
+Soss includes several functions for querying sets of variables associated with a model. As described above, models are function-like, with the inputs given by {\bf \texttt{arguments}}. In the body of a model every statement declares that some variable is either {\bf \texttt{sampled}} or {\bf \texttt{assigned}}. The sampled and assigned variables together comprise the {\bf \texttt{parameters}}, and all of the above are {\bf \texttt{variables}}. Each of these is a Soss function that takes a model and returns a vector of distinct Julia symbols.
+
+Soss ignores the ordering of statements given by the user, instead working in terms of the DAG ordering. You can access this graph with {\bf \texttt{digraph}}, or use {\bf \texttt{poset}} to get the partial order. Finally, {\bf \texttt{toposort}} returns a topologically-ordered vector of the parameters. Each of these three functions takes a model as input.
+
+Soss represents and manipulates variable dependencies using \jl#SimpleGraphs#, \jl#SimplePosets#, and \jl#SimplePartitions# from \cite{SimpleWorld}.
+
+
+\subsection{Model Transformations}
+
+\begin{description}
+    \item[\texttt{Do}] implements Pearl's {\footnotesize\texttt{do}} operator for causal intervention \cite{Pearl1995}.\footnote{Our {\footnotesize\texttt{Do}} operator is capitalized because {\footnotesize\texttt{do}} is a keyword in Julia.}
+    \item[\texttt{predictive}] is like \jl#Do#, but only returns the strongly-connected components containing the specified variables. This is useful for sampling from the posterior predictive distribution.
+    \item[\texttt{markovBlanket}]  takes a model and a variable, and returns a model representing the Markov blanket at the given variable.
+\end{description}
 
 \section{Implementation}
 
@@ -206,13 +230,6 @@ struct Model{A,B,M}
     retn  :: Union{Nothing, Symbol, Expr}
 end
 \end{minted}
-
-
-\section{Performance}
-
-\todo[inline]{Let's implement models from \url{https://statisticalrethinkingjulia.github.io/MCMCBenchmarks.jl/latest/benchmarks/} for benchmark comparisons}
-
-\todo[inline]{Can Soss really generate arbitrary code?}
 
 The ability to generate arbitrary  Julia code makes it difficult to measure performance in Soss. When a performance bottleneck is found, developers or users can ask Soss to generate something different. This design places no a priori constraints on performance.
 
@@ -234,18 +251,18 @@ which allows us to generate closures from generated functions.
 
 Programs that can be generated by Soss are turing complete, as all constructs of Lambda Calculus can be generated.
 
-\begin{minted}{julia}
-  abstract type LCTerm end
-  struct Lam{Arg, Body <: LCTerm} <: LCTerm end
-  struct App{Fn<:LCTerm, Arg<:LCTerm} <: LCTerm end
-  struct Var{N} <: LCTerm end
+% \begin{minted}{julia}
+%   abstract type LCTerm end
+%   struct Lam{Arg, Body <: LCTerm} <: LCTerm end
+%   struct App{Fn<:LCTerm, Arg<:LCTerm} <: LCTerm end
+%   struct Var{N} <: LCTerm end
   
-  cg(::Type{Lam{Arg, Term}}) where {Arg, Term} =  :($Arg -> $(cg(Term)))
-  cg(::Type{App{Fn, Arg}}) where {Fn, Arg} =  :($(cg(Fn))($(cg(Arg))))
-  cg(::Type{Var{N}}) where N = N
+%   cg(::Type{Lam{Arg, Term}}) where {Arg, Term} =  :($Arg -> $(cg(Term)))
+%   cg(::Type{App{Fn, Arg}}) where {Fn, Arg} =  :($(cg(Fn))($(cg(Arg))))
+%   cg(::Type{Var{N}}) where N = N
 
-  @gg lc(::Type{Term}) where Term <: LCTerm = cg(Term)
-\end{minted} 
+%   @gg lc(::Type{Term}) where Term <: LCTerm = cg(Term)
+% \end{minted} 
   % tolc(expr::Expr) =  @match expr begin
   %                       :($f($arg)) => App{tolc(f), tolc(arg)}
   %                       :($x => $y) => Lam{x, tolc(y)}
@@ -331,7 +348,7 @@ We would like to acknowledge...
         \\ &+ \sum_{\substack{1 \leq i \leq I \\ 1 \leq j \leq J}} \left(- \log{\left(σ \right)} - \frac    {\log{\pi }}{2} - \frac{\log{2 }}{2} - \frac{\left({y}_{ij} - {\hat{y}}_{ij}\right)^{2}}{2 σ^{2}    }\right) 
     \end{aligned}
     \]
-    \caption{Before}
+    \caption{Direct implementation}
     \end{subfigure}
     \hfill
     \begin{subfigure}[t]{0.4\textwidth}
@@ -348,16 +365,58 @@ We would like to acknowledge...
     \end{aligned}
 \]
     \captionsetup{skip=27pt}
-    \caption{After}
+    \caption{After symbolic simplification}
     \end{subfigure}
-    \caption{Symbolic log-density of $m$ before (a) and after (b) simplification steps. Reduction }
+    \caption{Symbolic log-density of $m$ before (a) and after (b) simplification steps.}
     \label{}
 \end{figure}
 
-Before simplification:
+\begin{figure}[t]
+\centering
+\begin{subfigure}[t]{0.48\textwidth}
+\begin{minted}{julia}
+julia> Soss.sourceRand()(m)
+quote
+    σ = rand(HalfNormal())
+    λ = rand(HalfCauchy())
+    σJ = rand(HalfNormal(λ))
+    σI = rand(HalfNormal(λ))
+    β = rand(iid(J, Normal(0, σJ)))
+    α = rand(iid(I, Normal(0, σI)))
+    yhat = α .+ β'
+    y = rand(For(I, J) do i, j
+                Normal(yhat[i, j], σ)
+            end)
+    (I=I, J=J, yhat=yhat, λ=λ, σI=σI, 
+    σJ=σJ, α=α, β=β, σ=σ, y=y) 
+end
+\end{minted}
+\caption{\footnotesize{\texttt{rand}}}
+\end{subfigure}
+\begin{subfigure}[t]{0.48\textwidth}
+\begin{minted}{julia}
+julia> Soss.sourceLogpdf()(m)
+quote
+    _ℓ = 0.0
+    _ℓ += logpdf(HalfNormal(), σ)
+    _ℓ += logpdf(HalfCauchy(), λ)
+    _ℓ += logpdf(HalfNormal(λ), σJ)
+    _ℓ += logpdf(HalfNormal(λ), σI)
+    _ℓ += logpdf(Normal(0, σJ) |> iid(J), β)
+    _ℓ += logpdf(Normal(0, σI) |> iid(I), α)
+    yhat = α .+ β'
+    _ℓ += logpdf(For(I, J) do i, j
+                Normal(yhat[i, j], σ)
+            end, y)
+    return _ℓ
+end
+\end{minted}
+\caption{\footnotesize{\texttt{logpdf}}}
+\end{subfigure}
+\caption{Generated code when calling \footnotesize{\texttt{rand(m)}} and \footnotesize{\texttt{logpdf(m,x)}}.} 
+\label{} 
+\end{figure}
 
-
-After simplification:
 
 
 
