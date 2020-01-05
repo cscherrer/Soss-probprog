@@ -186,7 +186,7 @@ At this writing, the following inference primitive are available:
 
 \begin{description}  
     \item[\texttt{rand}] draws a random point or sample from a given distribution.
-    \item[\texttt{particles}] draws a \emph{systematic sample}, as described in \cite{Douc2005}.
+    \item[\texttt{particles}] uses \jl#MonteCarloMeasurements.jl# to draw a \emph{systematic sample} \cite{Douc2005}.
     \item[\texttt{logpdf}] takes a distribution and a point, and returns the log-density at that point.
     \item[\texttt{xform}] takes a distribution and some known data, and returns a bijection from $\mathbb{R}^n$ to the space of unknowns. This is useful for algorithms like Hamiltonian Monte Carlo \cite{Neal2011}.
     \item[\texttt{symlogpdf}] takes a model, and returns a SymPy \cite{10.7717/peerj-cs.103} representation of the log-density, with some additional Julia-based simplifications.
@@ -194,8 +194,6 @@ At this writing, the following inference primitive are available:
 \end{description}
 
 In the above, a \emph{distribution} refers to a joint distribution, while \emph{point} refers to a named tuple in the space space of a distribution.
-
-\todo[inline]{cite MonteCarloMeasurements.jl and TransformVariables.jl}
 
 The set of inference primitives is not fixed, but can be extended by users. New primitives can be added in outside packages, and does not require making changes to the Soss codebase. 
 
@@ -391,7 +389,7 @@ Soss began with a goal of representing models with continuous, fixed-dimensional
 
 \emph{Gen} \cite{Cusumano-Towner:2019} was developed independently from Soss, but takes a similar approach (and distinct from most PPLs) in its representation of a model as a function from its arguments to a "trace" (to use Gen's terminology). In both Soss and Gen's static DSL, this trace is a mapping from variable names to values. The similarity of these systems makes interoperability relatively straightforward, as demonstrated in \emph{SossGen} (\url{https://github.com/cscherrer/SossGen.jl}).
 
-\emph{Turing} \cite{ge2018t}
+\emph{Turing} \cite{ge2018t} is syntactically similar to Soss, but favors a more imperative style. Turing can represent a wider variety of models than Soss, in particular Bayesian nonparameteric models, but sacrifices some ability to reason staticically about models in order to achieve this. We hope to soon find ways to interface with Turing so users can benefit from both Turing's modeling flexibility and Soss's static analysis and specialized code generation.
 
 \begin{acks}
 We would like to acknowledge...
@@ -402,30 +400,29 @@ We would like to acknowledge...
 
 \appendix
 
-\section{Model Syntax}
+% \section{Model Syntax}
 
-\begin{figure}[!t]
-  \centering
-  %\fbox{\rule[-.5cm]{0cm}{\linedwid} \rule[-.5cm]{4cm}{0cm}}
-  % using the backnaur package
-\begin{bnf*}
-  \bnfprod{model}{\bnfts{@model} \bnfsp \bnfpn{args} \bnfsp \bnfts{begin} \bnfsp \bnfpn{statements} \bnfsp \bnfts{end}}\\
-  \bnfprod{args}{\bnfes \bnfor \bnfpn{Symbol} \bnfor \bnfpn{Symbol} \bnfts{,} \bnfpn{args}} \\
-  \bnfprod{statements}{\bnfpn{statement} \bnfor \bnfpn{statement} \bnfsp \bnftd{Julia Line Sep} \bnfsp \bnfpn{statements} \bnfor \bnfpn{statements} \bnfsp \bnfpn{retn}} \\ 
-  \bnfprod{statement}{\bnfpn{assign} \bnfor \bnfpn{sample}} \\
-  \bnfprod{assign}{\bnfpn{Symbol} \bnfsp \bnfts{=} \bnfsp \bnfpn{Expr}} \\
-  \bnfprod{sample}{\bnfpn{Symbol} \bnfsp \bnfts{\textasciitilde}} \bnfsp \bnfpn{Measure} \\
-  \bnfprod{retn}{\bnfts{return} \bnfsp \bnfpn{Expr}} \\
-  \bnfprod{Symbol}{\bnftd{Julia Symbol}} \\ 
-  \bnfprod{Expr}{\bnftd{Julia Expr}} \\
-  \bnfprod{Measure}{\bnftd{Probability measure (see text)}}
-\end{bnf*}
-  \caption{Backus-Naur Form representation for a user-specified model.}
-  \label{fig:bnf}
-  \Description{Placeholder figure.}
-\end{figure}
+% \begin{figure}[!t]
+%   \centering
+%   %\fbox{\rule[-.5cm]{0cm}{\linedwid} \rule[-.5cm]{4cm}{0cm}}
+%   % using the backnaur package
+% \begin{bnf*}
+%   \bnfprod{model}{\bnfts{@model} \bnfsp \bnfpn{args} \bnfsp \bnfts{begin} \bnfsp \bnfpn{statements} \bnfsp \bnfts{end}}\\
+%   \bnfprod{args}{\bnfes \bnfor \bnfpn{Symbol} \bnfor \bnfpn{Symbol} \bnfts{,} \bnfpn{args}} \\
+%   \bnfprod{statements}{\bnfpn{statement} \bnfor \bnfpn{statement} \bnfsp \bnftd{Julia Line Sep} \bnfsp \bnfpn{statements} \bnfor \bnfpn{statements} \bnfsp \bnfpn{retn}} \\ 
+%   \bnfprod{statement}{\bnfpn{assign} \bnfor \bnfpn{sample}} \\
+%   \bnfprod{assign}{\bnfpn{Symbol} \bnfsp \bnfts{=} \bnfsp \bnfpn{Expr}} \\
+%   \bnfprod{sample}{\bnfpn{Symbol} \bnfsp \bnfts{\textasciitilde}} \bnfsp \bnfpn{Measure} \\
+%   \bnfprod{retn}{\bnfts{return} \bnfsp \bnfpn{Expr}} \\
+%   \bnfprod{Symbol}{\bnftd{Julia Symbol}} \\ 
+%   \bnfprod{Expr}{\bnftd{Julia Expr}} \\
+%   \bnfprod{Measure}{\bnftd{Probability measure (see text)}}
+% \end{bnf*}
+%   \caption{Backus-Naur Form representation for a user-specified model.}
+%   \label{fig:bnf}
+%   \Description{Placeholder figure.}
+% \end{figure}
 
-\section{Symbolic Simplification}
  
 \begin{figure}[t]
 \centering
