@@ -224,9 +224,11 @@ Soss represents and manipulates variable dependencies using \jl#SimpleGraphs#, \
 
 Soss's inference primitives generate code on demand using the \jl#GeneralizedGenerated.jl# library, which introduces a \jl#@gg# macro that works as an extension of Julia's built-in \jl#@generated# macro for \emph{generated functions} \cite{bezanson2012julia}. Similarly to \jl#@generated#, code generated using a \jl#@gg# function cannot depend on the values of its arguments, but only on their types. 
 
-This is problematic, since we clearly need code generation to depend on the model itself. To address this, \jl#GeneralizedGenerated# includes facilities for lifting Julia values to the type level. 
+This \emph{staged compilation} introduces some additional overhead on the first call on a given argument type, due to generation and compilation of specialized code. Subsequent calls on this same type have no such overhead, and generally benefit from specialization. To acheive a net gain from this requires making enough function calls to offset the cost of code generation. This makes the approach a natural fit for the PPL domain, where long-running tight loops are very common. 
 
-Using this, the type of a Soss model is \jl#Model{A,B,M}#, where 
+However, the requirement that the generated code only depends on the types presents a challenge, since we clearly need it to depend on the model itself. To address this, \jl#GeneralizedGenerated# includes facilities for lifting Julia values to the type level. 
+
+The type of a Soss model is thus \jl#Model{A,B,M}#, where 
 \begin{itemize}
     \item \jl#A# gives the type of the \emph{arguments} (\jl#A=NamedTuple{T}# for some tuple of symbols \jl#T#),
     \item \jl#B# is a type-level representation of the \emph{body}, and
