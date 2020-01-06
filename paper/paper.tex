@@ -387,12 +387,12 @@ The idea of code generation and symbolic simplification in an embedded PPL goes 
 
 Soss began with a goal of representing models with continuous, fixed-dimensionality parameter spaces, inspired by \emph{Stan} \cite{stan:2017}.
 
-\emph{Gen} \cite{Cusumano-Towner:2019} was developed independently from Soss, but takes a similar approach (and distinct from most PPLs) in its representation of a model as a function from its arguments to a "trace" (to use Gen's terminology). In both Soss and Gen's static DSL, this trace is a mapping from variable names to values. The similarity of these systems makes interoperability relatively straightforward, as demonstrated in \emph{SossGen} (\url{https://github.com/cscherrer/SossGen.jl}).
+\emph{Gen} \cite{Cusumano-Towner:2019} was developed independently from Soss, but takes a similar approach (and distinct from most PPLs) in its representation of a model as a function from its arguments to a "trace" (to use Gen's terminology). In both Soss and Gen's static DSL, this trace is a mapping from variable names to values. The similarity of these systems makes interoperability relatively straightforward, as demonstrated in \emph{SossGen} (\url{https://github.com/cscherrer/SossGen.jl}). 
 
 \emph{Turing} \cite{ge2018t} is syntactically similar to Soss, but favors a more imperative style. Turing can represent a wider variety of models than Soss, in particular Bayesian nonparameteric models, but sacrifices some ability to reason staticically about models in order to achieve this. We hope to soon find ways to interface with Turing so users can benefit from both Turing's modeling flexibility and Soss's static analysis and specialized code generation.
 
 \begin{acks}
-We would like to acknowledge...
+The authors would like to thank the Julia community, in particular Seth Axen, Tamas Papp, Fredrik Bagge Carlson, the Turing and Gen development teams, and the Julia founders and core developers. 
 \end{acks}
 
 \bibliographystyle{acm-reference-format}
@@ -424,111 +424,110 @@ We would like to acknowledge...
 % \end{figure}
 
  
-\begin{figure}[t]
-\centering
-\begin{subfigure}[t]{0.48\textwidth}
-\begin{minted}{julia1}
-julia> Soss.sourceRand()(m)
-quote
-    σ = rand(HalfNormal())
-    λ = rand(HalfCauchy())
-    σJ = rand(HalfNormal(λ))
-    σI = rand(HalfNormal(λ))
-    β = rand(iid(J, Normal(0, σJ)))
-    α = rand(iid(I, Normal(0, σI)))
-    yhat = α .+ β'
-    y = rand(For(I, J) do i, j
-                Normal(yhat[i, j], σ)
-            end)
-    (I=I, J=J, yhat=yhat, λ=λ, σI=σI, 
-    σJ=σJ, α=α, β=β, σ=σ, y=y) 
-end
-\end{minted}
-\caption{\footnotesize{\texttt{rand}}}
-\end{subfigure}
-\begin{subfigure}[t]{0.48\textwidth}
-\begin{minted}{julia1}
-julia> Soss.sourceLogpdf()(m)
-quote
-    _ℓ = 0.0
-    _ℓ += logpdf(HalfNormal(), σ)
-    _ℓ += logpdf(HalfCauchy(), λ)
-    _ℓ += logpdf(HalfNormal(λ), σJ)
-    _ℓ += logpdf(HalfNormal(λ), σI)
-    _ℓ += logpdf(Normal(0, σJ) |> iid(J), β)
-    _ℓ += logpdf(Normal(0, σI) |> iid(I), α)
-    yhat = α .+ β'
-    _ℓ += logpdf(For(I, J) do i, j
-                Normal(yhat[i, j], σ)
-            end, y)
-    return _ℓ
-end
-\end{minted}
-\caption{\footnotesize{\texttt{logpdf}}}
-\end{subfigure}
-\caption{Generated code when calling \footnotesize{\texttt{rand(m)}} and \footnotesize{\texttt{logpdf(m,x)}}.} 
-\label{} 
-\end{figure}
+% \begin{figure}[t]
+% \centering
+% \begin{subfigure}[t]{0.48\textwidth}
+% \begin{minted}{julia1}
+% julia> Soss.sourceRand()(m)
+% quote
+%     σ = rand(HalfNormal())
+%     λ = rand(HalfCauchy())
+%     σJ = rand(HalfNormal(λ))
+%     σI = rand(HalfNormal(λ))
+%     β = rand(iid(J, Normal(0, σJ)))
+%     α = rand(iid(I, Normal(0, σI)))
+%     yhat = α .+ β'
+%     y = rand(For(I, J) do i, j
+%                 Normal(yhat[i, j], σ)
+%             end)
+%     (I=I, J=J, yhat=yhat, λ=λ, σI=σI, 
+%     σJ=σJ, α=α, β=β, σ=σ, y=y) 
+% end
+% \end{minted}
+% \caption{\footnotesize{\texttt{rand}}}
+% \end{subfigure}
+% \begin{subfigure}[t]{0.48\textwidth}
+% \begin{minted}{julia1}
+% julia> Soss.sourceLogpdf()(m)
+% quote
+%     _ℓ = 0.0
+%     _ℓ += logpdf(HalfNormal(), σ)
+%     _ℓ += logpdf(HalfCauchy(), λ)
+%     _ℓ += logpdf(HalfNormal(λ), σJ)
+%     _ℓ += logpdf(HalfNormal(λ), σI)
+%     _ℓ += logpdf(Normal(0, σJ) |> iid(J), β)
+%     _ℓ += logpdf(Normal(0, σI) |> iid(I), α)
+%     yhat = α .+ β'
+%     _ℓ += logpdf(For(I, J) do i, j
+%                 Normal(yhat[i, j], σ)
+%             end, y)
+%     return _ℓ
+% end
+% \end{minted}
+% \caption{\footnotesize{\texttt{logpdf}}}
+% \end{subfigure}
+% \caption{Generated code when calling \footnotesize{\texttt{rand(m)}} and \footnotesize{\texttt{logpdf(m,x)}}.} 
+% \label{} 
+% \end{figure}
 
 
 
 
-\section{Extended example }
-\todo[inline]{Break this up! This is just a staging area}
+% \section{Extended example }
 
-\begin{minted}{julia1}
-julia> using Revise, Soss, Random
+% \begin{minted}{julia1}
+% julia> using Revise, Soss, Random
 
-julia> Random.seed!(1);
+% julia> Random.seed!(1);
 
-julia> m = @model I,J begin
-           λ ~ HalfCauchy()
-           σI ~ HalfNormal(λ)
-           σJ ~ HalfNormal(λ)
-           α ~ Normal(0, σI) |> iid(I)
-           β ~ Normal(0, σJ) |> iid(J)
-           yhat = α .+ β'
-           σ ~ HalfNormal()
-           y ~ For(I,J) do i,j 
-                   Normal(yhat[i,j], σ)
-               end
-       end;
+% julia> m = @model I,J begin
+%            λ ~ HalfCauchy()
+%            σI ~ HalfNormal(λ)
+%            σJ ~ HalfNormal(λ)
+%            α ~ Normal(0, σI) |> iid(I)
+%            β ~ Normal(0, σJ) |> iid(J)
+%            yhat = α .+ β'
+%            σ ~ HalfNormal()
+%            y ~ For(I,J) do i,j 
+%                    Normal(yhat[i,j], σ)
+%                end
+%        end;
 
-julia> truth = rand(m(I=2,J=3)); pairs(truth);
+% julia> truth = rand(m(I=2,J=3)); pairs(truth);
 
-julia> post = dynamicHMC(m(I=2,J=3), (y=truth.y,));
+% julia> post = dynamicHMC(m(I=2,J=3), (y=truth.y,));
 
-julia> postpred = predict(m(I=2,J=3), post) |> particles;
+% julia> postpred = predict(m(I=2,J=3), post) |> particles;
 
-julia> postpred.yhat
-2×3 Array{Particles{Float64,1000},2}:
- 0.241 ± 0.26  0.527 ± 0.3   -0.556 ± 0.38
- 0.22 ± 0.26   0.506 ± 0.32  -0.577 ± 0.37
+% julia> postpred.yhat
+% 2×3 Array{Particles{Float64,1000},2}:
+%  0.241 ± 0.26  0.527 ± 0.3   -0.556 ± 0.38
+%  0.22 ± 0.26   0.506 ± 0.32  -0.577 ± 0.37
 
-julia> postpred.y
-2×3 Array{Particles{Float64,1000},2}:
- 0.224 ± 0.58  0.529 ± 0.58  -0.58 ± 0.64
- 0.223 ± 0.56  0.483 ± 0.58  -0.58 ± 0.61
+% julia> postpred.y
+% 2×3 Array{Particles{Float64,1000},2}:
+%  0.224 ± 0.58  0.529 ± 0.58  -0.58 ± 0.64
+%  0.223 ± 0.56  0.483 ± 0.58  -0.58 ± 0.61
 
-julia> m.args
-2-element Array{Symbol,1}:
- :I
- :J
+% julia> m.args
+% 2-element Array{Symbol,1}:
+%  :I
+%  :J
 
-julia> pairs(m.vals)
-pairs(::NamedTuple) with 1 entry:
-  :yhat => :(α .+ β')
+% julia> pairs(m.vals)
+% pairs(::NamedTuple) with 1 entry:
+%   :yhat => :(α .+ β')
 
-julia> pairs(m.dists)
-pairs(::NamedTuple) with 7 entries:
-  :λ  => :(HalfCauchy())
-  :σI => :(HalfNormal(λ))
-  :σJ => :(HalfNormal(λ))
-  :α  => :(Normal(0, σI) |> iid(I))
-  :β  => :(Normal(0, σJ) |> iid(J))
-  :σ  => :(HalfNormal())
-  :y  => :(For(I, J) do i, j…
+% julia> pairs(m.dists)
+% pairs(::NamedTuple) with 7 entries:
+%   :λ  => :(HalfCauchy())
+%   :σI => :(HalfNormal(λ))
+%   :σJ => :(HalfNormal(λ))
+%   :α  => :(Normal(0, σI) |> iid(I))
+%   :β  => :(Normal(0, σJ) |> iid(J))
+%   :σ  => :(HalfNormal())
+%   :y  => :(For(I, J) do i, j…
 
-\end{minted}
+% \end{minted}
 
 \end{document}
