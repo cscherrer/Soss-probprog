@@ -186,7 +186,7 @@ At this writing, the following inference primitive are available:
 
 \begin{description}  
     \item[\texttt{rand}] draws a random point or sample from a given distribution.
-    \item[\texttt{particles}] uses \jl#MonteCarloMeasurements.jl# to draw a \emph{systematic sample} \cite{Douc2005}.
+    \item[\texttt{particles}] draws a \emph{systematic sample} using \jl#MonteCarloMeasurements.jl# \cite{8ff6a743-0ad6-4d98-bbb3-5d549c698bc1}.
     \item[\texttt{logpdf}] takes a distribution and a point, and returns the log-density at that point.
     \item[\texttt{xform}] takes a distribution and some known data, and returns a bijection from $\mathbb{R}^n$ to the space of unknowns. This is useful for algorithms like Hamiltonian Monte Carlo \cite{Neal2011}.
     \item[\texttt{symlogpdf}] takes a model, and returns a SymPy \cite{10.7717/peerj-cs.103} representation of the log-density, with some additional Julia-based simplifications.
@@ -389,12 +389,12 @@ Soss began with a goal of representing models with continuous, fixed-dimensional
 
 \emph{Gen} \cite{Cusumano-Towner:2019} was developed independently from Soss, but takes a similar approach (and distinct from most PPLs) in its representation of a model as a function from its arguments to a "trace" (to use Gen's terminology). In both Soss and Gen's static DSL, this trace is a mapping from variable names to values. The similarity of these systems makes interoperability relatively straightforward, as demonstrated in \emph{SossGen} (\url{https://github.com/cscherrer/SossGen.jl}). 
 
-\emph{Turing} \cite{ge2018t} is syntactically similar to Soss, but favors a more imperative style. Turing can represent a wider variety of models than Soss, in particular Bayesian nonparameteric models, but sacrifices some ability to reason staticically about models in order to achieve this. We hope to soon find ways to interface with Turing so users can benefit from both Turing's modeling flexibility and Soss's static analysis and specialized code generation.
+\emph{Turing} \cite{ge2018t} is syntactically similar to Soss, but tends to favor a more imperative style. Turing calls the Julia compiler at a much earlier stage than Soss. This allows representation of a wider variety of models, at the cost of some flexibility of model transformations. We hope to soon find ways to interface with Turing so users can benefit from both Turing's modeling flexibility and Soss's static analysis and specialized code generation.
 
 \begin{acks}
 The authors would like to thank the Julia community, in particular Seth Axen, Tamas Papp, Fredrik Bagge Carlson, the Turing and Gen development teams, and the Julia founders and core developers. 
 \end{acks}
- 
+
 \bibliographystyle{acm-reference-format}
 \bibliography{ref}
 

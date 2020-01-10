@@ -229,3 +229,18 @@ year = {1995}
   title = 	 {\texttt{SimpleWorld} {J}ulia module},
   howpublished = {\url{github.com/scheinerman/SimpleWorld.jl}}
 }
+
+@misc{8ff6a743-0ad6-4d98-bbb3-5d549c698bc1,
+  abstract     = {This package facilitates working with probability distributions by means of Monte-Carlo methods, in a way that allows for propagation of probability distributions through functions. This is useful for, e.g., nonlinear uncertainty propagation. A variable or parameter might be associated with uncertainty if it is measured or otherwise estimated from data. We provide two core types to represent probability distributions: Particles and StaticParticles, both &lt;: Real. (The name "Particles" comes from the particle-filtering literature.) These types all form a Monte-Carlo approximation of the distribution of a floating point number, i.e., the distribution is represented by samples/particles. Correlated quantities are handled as well, see multivariate particles below.<br>
+<br>
+Although several interesting use cases for doing calculations with probability distributions have popped up (see Examples), the original goal of the package is similar to that of Measurements.jl, to propagate the uncertainty from input of a function to the output. The difference compared to a Measurement is that Particles represent the distribution using a vector of unweighted particles, and can thus represent arbitrary distributions and handle nonlinear uncertainty propagation well. Functions like f(x) = x², f(x) = sign(x) at x=0 and long-time integration, are examples that are not handled well using linear uncertainty propagation ala Measurements.jl. MonteCarloMeasurements also support correlations between quantities.<br>
+<br>
+A number of type Particles behaves just as any other Number while partaking in calculations. After a calculation, an approximation to the complete distribution of the output is captured and represented by the output particles. mean, std etc. can be extracted from the particles using the corresponding functions. Particles also interact with Distributions.jl, so that you can call, e.g., Normal(p) and get back a Normal type from distributions or fit(Gamma, p) to get a Gammadistribution. Particles can also be iterated, asked for maximum/minimum, quantile etc. If particles are plotted with plot(p), a histogram is displayed. This requires Plots.jl. A kernel-density estimate can be obtained by density(p) is StatsPlots.jl is loaded.},
+  author       = {Bagge Carlson, Fredrik},
+  language     = {eng},
+  month        = {04},
+  publisher    = {github},
+  title        = {MonteCarloMeasurements.jl : Propagation of distributions by Monte-Carlo sampling: Real number types with uncertainty represented by particle clouds.},
+  url          = {https://github.com/baggepinnen/MonteCarloMeasurements.jl},
+  year         = {2019},
+}
