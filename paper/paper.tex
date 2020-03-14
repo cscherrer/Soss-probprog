@@ -184,9 +184,9 @@ A given inference algorithm can be expressed in terms of a collection of functio
 
 At this writing, the following inference primitive are available:
 
-\begin{description}  
+\begin{description}
     \item[\texttt{rand}] draws a random point or sample from a given distribution.
-    \item[\texttt{particles}] draws a \emph{systematic sample} using \jl#MonteCarloMeasurements.jl# \cite{8ff6a743-0ad6-4d98-bbb3-5d549c698bc1}.
+    \item[\texttt{particles}] draws a \emph{systematic sample} using \jl#MonteCarloMeasurements.jl# \cite{bagge2020MCM.jl}.
     \item[\texttt{logpdf}] takes a distribution and a point, and returns the log-density at that point.
     \item[\texttt{xform}] takes a distribution and some known data, and returns a bijection from $\mathbb{R}^n$ to the space of unknowns. This is useful for algorithms like Hamiltonian Monte Carlo \cite{Neal2011}.
     \item[\texttt{symlogpdf}] takes a model, and returns a SymPy \cite{10.7717/peerj-cs.103} representation of the log-density, with some additional Julia-based simplifications.
