@@ -12,7 +12,8 @@ https://github.com/cscherrer/Soss-probprog/blob/master/paper/paper.pdf
   publisher={Zenodo}, 
   author={Scherrer, Chad and Zhao, Taine}, 
   year={2020}, 
-  month={Oct} }
+  month={Oct} 
+}
 ```
 
 # To Build
