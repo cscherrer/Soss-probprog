@@ -5,15 +5,14 @@ https://github.com/cscherrer/Soss-probprog/blob/master/paper/paper.pdf
 # Citing
 
 ```
-@proceedings{scherrer_chad_2020_5520061,
-  title        = {{Soss: Declarative Probabilistic Programming via 
-                   Runtime Code Generation}},
-  year         = 2020,
-  publisher    = {Zenodo},
-  month        = oct,
-  doi          = {10.5281/zenodo.5520061},
-  url          = {https://doi.org/10.5281/zenodo.5520061}
-}
+@inproceedings{scherrer, chad_zhao, taine_2020, 
+  title={Soss: Declarative Probabilistic Programming via Runtime Code Generation}, 
+  DOI={10.5281/zenodo.5520061}, 
+  abstractNote={0 <p>We present Soss, a declarative probabilistic programming language embedded in the Julia language. Soss represents statistical models in terms of abstract syntax trees, and uses staged compilation for on-demand generation of ``inference primitives&#39;&#39; (random sampling, log-density, etc) without requiring casual users to worry about such details.</p> <p>&nbsp;</p> <p>The approach taken by Soss makes it easy to extend to take advantage of other packages in the rapidly-growing Julia ecosystem. At the time of this writing, Soss users can choose from several inference back-ends and connect easily with larger systems SymPy and Gen.</p>}, 
+  publisher={Zenodo}, 
+  author={Scherrer, Chad and Zhao, Taine}, 
+  year={2020}, 
+  month={Oct} }
 ```
 
 # To Build
