@@ -1,3 +1,8 @@
+# The paper
+
+https://github.com/cscherrer/Soss-probprog/blob/master/paper/paper.pdf
+
+
 # To Build
 This requires [pygments-julia](https://github.com/sisl/pygments-julia)
 
